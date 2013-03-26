@@ -58,3 +58,7 @@ $(IO).o: $<
 
 clean:
 	-rm $(MAIN) $(OBJECT) *.mod
+
+distclean:
+	-rm $(MAIN) $(OBJECT) *.mod *.o
+
