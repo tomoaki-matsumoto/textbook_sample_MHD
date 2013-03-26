@@ -36,7 +36,7 @@ contains
 
   end subroutine step_full
   ! ---------------------------------------------------------------------------
-  ! 2nd order Runge-Kutta
+  ! 2nd order Runge-Kutta: case of Heun's method (RK2 alpha = 1)
   ! ---------------------------------------------------------------------------
   subroutine step_unsplit_rk2
     use grid
@@ -59,7 +59,7 @@ contains
     call u2v(W, V)
   end subroutine step_unsplit_rk2
   ! ---------------------------------------------------------------------------
-  ! 3rd order Runge-Kutta
+  ! 3rd order Runge-Kutta (see PLUTO users guide)
   ! ---------------------------------------------------------------------------
   subroutine step_unsplit_rk3
     use grid
@@ -86,7 +86,7 @@ contains
     call u2v(W, V)              ! V := V**
   end subroutine step_unsplit_rk3
   ! ---------------------------------------------------------------------------
-  ! 2nd order method: unsplit predictor-corrector
+  ! 2nd order method: unsplit predictor-corrector (equivalent to RK2 alpha=1/2)
   ! ---------------------------------------------------------------------------
   subroutine step_unsplit_pc2
     use grid
@@ -333,7 +333,7 @@ contains
     real(kind=DBL_KIND),parameter :: BW = (3.d0-ETA)/(1.d0-ETA)
 !!$    real(kind=DBL_KIND),parameter :: ETA = -1.d0
 !!$    real(kind=DBL_KIND),parameter :: BW = 1.d0
-    real(kind=DBL_KIND) :: dvla, dvlb
+    real(kind=DBL_KIND) :: dva, dvb
 #endif
 
     call util_arroffset(ndir,io,jo,ko)
@@ -355,16 +355,16 @@ contains
                      - (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)))*0.5d0
 #endif
 #if _RECONSTRUCTION_ == _MUSCL3_
-                dvla = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
-                dvlb = V(i,j,k,m) - V(i-io,j-jo,k-ko,m)
+                dva = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
+                dvb = V(i,j,k,m) - V(i-io,j-jo,k-ko,m)
                 vl(i,j,k,m) = V(i,j,k,m) &
-                     + (1.d0 - ETA)/4.d0 * MINMOD(dvlb, BW*dvla) &
-                     + (1.d0 + ETA)/4.d0 * MINMOD(dvla, BW*dvlb)
-                dvla = V(i+i2,j+j2,k+k2,m) - V(i+io,j+jo,k+ko,m)
-                dvlb = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
+                     + (1.d0 - ETA)/4.d0 * MINMOD(dvb, BW*dva) &
+                     + (1.d0 + ETA)/4.d0 * MINMOD(dva, BW*dvb)
+                dva = V(i+i2,j+j2,k+k2,m) - V(i+io,j+jo,k+ko,m)
+                dvb = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
-                     - (1.d0 - ETA)/4.d0 * MINMOD(dvla, BW*dvlb) &
-                     - (1.d0 + ETA)/4.d0 * MINMOD(dvlb, BW*dvla)
+                     - (1.d0 - ETA)/4.d0 * MINMOD(dva, BW*dvb) &
+                     - (1.d0 + ETA)/4.d0 * MINMOD(dvb, BW*dva)
 #endif
              enddo
           enddo
