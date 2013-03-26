@@ -1,0 +1,14 @@
+コーディングルールのメモ
+
+変数
+parameter ...... すべて大文字
+module 変数 .... 先頭大文字
+ローカル変数 ... 小文字
+マクロ定数 ..... _マクロ名_
+マクロ関数 ..... マクロ()
+
+変数名
+V, v ........... primitive variable
+Q, q ........... primitive variable
+U, u ........... conservative variable
+W, w ........... conservative variable
