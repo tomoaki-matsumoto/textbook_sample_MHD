@@ -1,8 +1,8 @@
 ! Header file for configuration
 #include "constant.h"
 
-! EOS and flux
-#define _MHD_
+! flux and EOS
+#define _FLUX_SCHEME_ _MHD_
 
 
 ! #define _DIRECTIONAL_SPLIT_ _UNSPLIT_

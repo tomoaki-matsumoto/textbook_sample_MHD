@@ -40,26 +40,27 @@ contains
     do k = KMINGH, KMAXGH
        do j = JMINGH, JMAXGH
           do i = IMINGH, IMAXGH
+#if (_FLUX_SCHEME_ == _HD_) || (_FLUX_SCHEME_ == _MHD_)
              if ( x(i) <= 0.d0 ) then
 !!$             if ( x(i) + y(j) <= 0.d0) then
                 V(i,j,k,MRHO) = 1.d0
                 V(i,j,k,MP) = 1.d0
 
-#ifdef _MHD_
+#if _FLUX_SCHEME_ ==  _MHD_
                 V(i,j,k,MBX) = 0.75d0 * SQRTPI4
                 V(i,j,k,MBY) = 1.d0 * SQRTPI4
                 V(i,j,k,MBZ) = 0.d0
-#endif
+#endif !_MHD_
              else
                 V(i,j,k,MRHO) = 0.125d0
                 V(i,j,k,MP) = 0.1d0
 
-#ifdef _MHD_
+#ifdef _FLUX_SCHEME_ ==  _MHD_
                 V(i,j,k,MBX) = 0.75d0 * SQRTPI4
                 V(i,j,k,MBY) = -1.d0 * SQRTPI4
                 V(i,j,k,MBZ) = 0.d0
-#endif
-
+#endif !_MHD_
+#endif !_HD_ or _MHD_
              end if
           end do
        end do

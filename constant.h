@@ -1,5 +1,10 @@
 ! Definition of constants for configuration
 
+! flux and EOS
+#define _SCALAR_ADVECTION_  0
+#define _HD_  1
+#define _MHD_ 2
+
 ! Directional split
 #define _UNSPLIT_ 0
 #define _SPLIT_   1

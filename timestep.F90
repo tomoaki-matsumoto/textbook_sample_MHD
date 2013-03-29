@@ -137,10 +137,10 @@ contains
   ! fractional time step
   ! ---------------------------------------------------------------------------
   subroutine step_split
-#ifdef _MHD_
+#if _FLUX_SCHEME_ == _MHD_
     use grid, only: V, W, F, Dtime
     use flux_eos, only : source_b, v2u, u2v
-#endif
+#endif !_MHD_
     if (NDIM == 1) then
        call STEP_SPLIT_1D(MX)
     elseif (NDIM == 2) then
@@ -150,11 +150,11 @@ contains
     else
        print *, '*** error in step_fractional'
     endif
-#ifdef _MHD_
+#if _FLUX_SCHEME_ == _MHD_
     call v2u(V, W)
     call source_b(F, W, Dtime)
     call u2v(W, V)
-#endif
+#endif !_MHD_
   end subroutine step_split
   ! ---------------------------------------------------------------------------
   ! fractional time step for 3D
@@ -271,17 +271,17 @@ contains
   ! ---------------------------------------------------------------------------
   subroutine w_update( dt )
     use grid
-#ifdef _MHD_
+#if _FLUX_SCHEME_ == _MHD_
     use flux_eos, only : source_b
-#endif
+#endif !_MHD_
     real(kind=DBL_KIND),intent(IN) :: dt
     integer :: n
     do n = MX, MX+NDIM-1
        call w_update_ndir(dt, n)
     end do
-#ifdef _MHD_
+#if _FLUX_SCHEME_ == _MHD_
     call source_b(F, W, dt)
-#endif
+#endif !_MHD_
   end subroutine w_update
   ! ---------------------------------------------------------------------------
   ! update v by flux for each direction
