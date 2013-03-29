@@ -28,7 +28,7 @@ program main
      Step = Step + 1
      print *, Step, Dtime, Time
      call step_full
-     if ( mod(Step, 100) == 0 ) call io_writedata(dir)
+     if ( mod(Step, 10) == 0 ) call io_writedata(dir)
      if ( Step >= STEPMAX ) exit
      if ( bool_halt ) exit
   end do

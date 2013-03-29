@@ -34,12 +34,17 @@ contains
        Z(k) = (k-kc0) * dz
     end do
     ! define physical variables
-    V(:,:,:,MVX) = 0.d0
-    V(:,:,:,MVY) = 0.d0
-    V(:,:,:,MVZ) = 0.d0
+    V(:,:,:,:) = 0.d0           ! initialize
     do k = KMINGH, KMAXGH
        do j = JMINGH, JMAXGH
           do i = IMINGH, IMAXGH
+#if _FLUX_SCHEME_ == _SCALAR_ADVECTION_
+             if ( x(i) <= 0.d0 ) then
+                V(i,j,k,MRHO) = 2.d0
+             else
+                V(i,j,k,MRHO) = 1.d0
+             endif
+#endif !_SCALAR_ADVECTION_
 #if (_FLUX_SCHEME_ == _HD_) || (_FLUX_SCHEME_ == _MHD_)
              if ( x(i) <= 0.d0 ) then
 !!$             if ( x(i) + y(j) <= 0.d0) then
@@ -60,8 +65,8 @@ contains
                 V(i,j,k,MBY) = -1.d0 * SQRTPI4
                 V(i,j,k,MBZ) = 0.d0
 #endif !_MHD_
-#endif !_HD_ or _MHD_
              end if
+#endif !_HD_ or _MHD_
           end do
        end do
     end do

@@ -37,19 +37,20 @@ contains
     do k = KMINGH, KMAXGH
        Z(k) = (k-kc0) * dz
     end do
+#if _FLUX_SCHEME_ == _HD_
     ! define physical variables
     V(:,:,:,MVX)  = 1.d0
     V(:,:,:,MVY)  = 1.d0
     V(:,:,:,MVZ)  = 0.d0
     V(:,:,:,MP)   = 1.d0
+#endif !_HD_
     V(:,:,:,MRHO) = 1.d0
-
     do k = KMINGH, KMAXGH
        do j = JMINGH, JMAXGH
           do i = IMINGH, IMAXGH
              if ( x(i) >= -0.1 .and. x(i) <= 0.1 .and. &
                   y(j) >= -0.1 .and. y(j) <= 0.1 ) then
-                V(i,j,k,MRHO) = 10.d0
+                V(i,j,k,MRHO) = 2.d0
              end if
           end do
        end do

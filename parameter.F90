@@ -8,7 +8,7 @@ module parameter
   real(kind=DBL_KIND),parameter :: PI4I = 1.d0/PI4
   real(kind=DBL_KIND),parameter :: SQRTPI = sqrt(PI)
   real(kind=DBL_KIND),parameter :: SQRTPI4 = sqrt(PI4)
-  real(kind=DBL_KIND),parameter :: CFL = 0.9d0
+  real(kind=DBL_KIND),parameter :: CFL = 0.5d0
 
   integer,parameter :: NDIM = 2 ! number of dimension
   integer,parameter :: NX = 128, NY = 128, NZ = 1

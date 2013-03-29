@@ -7,7 +7,7 @@ dir='DATA'
 ;; dir = 'DATA_unsplit_predictor'
 spawn, 'ls '+dir, r
 fn = r[(size(r))[1]-1]
-;; fn = 'st000326.d'
+fn = 'st000150.d'
 
 fn = dir +'/'+ fn
 print, fn
@@ -30,15 +30,16 @@ y = y[NGH:JMAX+NGH]
 z = z[NGH:KMAX+NGH]
 q = q[NGH:IMAX+NGH,NGH:JMAX+NGH,NGH:KMAX+NGH,*]
 
-if (size(q))[2] eq 1 then begin
+if size(q,/n_dim) eq 1 then begin
    mplot=0
-   plot, x, q[*,0,0,mplot]
+   plot, x, q[*,0,0,mplot] ; , title='1st Order'
    oplot, x, q[*,0,0,mplot],psym=4
-endif else if (size(q))[3] eq 1 then begin
+   oplot,[1,1]*time, [0,3]
+endif else if size(q,/n_dim) eq 2 then begin
    mplot=0
-   ;; tvcn, q[*,*,0,mplot], q[*,*,0,mplot], x, y, /noby,/asp, level=[0]
-   temp = q[*,*,0,7]/q[*,*,0,0]
-   tvcn, temp, temp, x, y, /noby,/asp, level=[0]
+   tvcn, q[*,*,0,mplot], q[*,*,0,mplot], x, y, /noby,/asp, level=[0]
+   ;; temp = q[*,*,0,7]/q[*,*,0,0]
+   ;; tvcn, temp, temp, x, y, /noby,/asp, level=[0]
    ;; beta = (q[*,*,0,4]^2+q[*,*,0,5]^2+q[*,*,0,6]^2)/q[*,*,0,7]
    ;; tvcn, beta, beta, x, y, /noby,/asp, level=[0]
 endif 

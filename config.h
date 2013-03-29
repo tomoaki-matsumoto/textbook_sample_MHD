@@ -2,11 +2,13 @@
 #include "constant.h"
 
 ! flux and EOS
-#define _FLUX_SCHEME_ _MHD_
+#define _FLUX_SCHEME_ _SCALAR_ADVECTION_
+! #define _FLUX_SCHEME_ _HD_
+! #define _FLUX_SCHEME_ _MHD_
 
 
-! #define _DIRECTIONAL_SPLIT_ _UNSPLIT_
-#define _DIRECTIONAL_SPLIT_ _SPLIT_
+#define _DIRECTIONAL_SPLIT_ _UNSPLIT_
+! #define _DIRECTIONAL_SPLIT_ _SPLIT_
 
 
 ! #define _TIME_MARCHING_ _EULER_

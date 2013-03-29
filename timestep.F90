@@ -315,7 +315,7 @@ contains
 #define FLMT(x, y) MINMOD(x, y)
 #endif
 #if _MUSCL2_LIMITER_ == _SUPERBEE_
-#define FLMT_(x, y) SUPERBEE(x, y)
+#define FLMT(x, y) SUPERBEE(x, y)
 #endif
   subroutine get_flux_ndir (ndir)
     use util
