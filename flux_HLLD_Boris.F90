@@ -1,4 +1,5 @@
-#define _FLOOR_IN_RHO_P_
+#include "config.h"
+#define FLOOR_IN_RHO_P
 ! 密度と圧力に下限値をつける。
 module flux_eos
   use parameter
@@ -321,7 +322,7 @@ contains
     bz  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MBZ)
     va2 = (bx**2+by**2+bz**2)*PI4I/rho   ! Alfven wave^2
     ca= sqrt(( Gamma*p/rho + va2 ) / (1.d0 + va2/CLIGHT2)) ! fast wave
-#if _DIRECTIONAL_SPLIT_ == _SPLIT_
+#if defined(DIRECTIONAL_SPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / max( &
             maxval(abs(vx)+ca)/h(MX), &
@@ -336,8 +337,7 @@ contains
     else
        print *, '*** error'
     endif
-#endif
-#if _DIRECTIONAL_SPLIT_ == _UNSPLIT_
+#elif defined(DIRECTIONAL_UNSPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / maxval( &
             (abs(vx)+ca)/h(MX) + &
@@ -352,6 +352,8 @@ contains
     else
        print *, '*** error'
     endif
+#else
+    ERROR
 #endif
   end subroutine cflcond
   !-----------------------------------------------------------------------
@@ -402,7 +404,7 @@ contains
          -(q(:,:,:,MBX)**2+q(:,:,:,MBY)**2+q(:,:,:,MBZ)**2)*pi8i &
          )*(GAMMA-1.0d0)
     q(:,:,:,MDB) = u(:,:,:,MDB)/dv
-#ifdef _FLOOR_IN_RHO_P_
+#ifdef FLOOR_IN_RHO_P
     q(:,:,:,MRHO) = max(q(:,:,:,MRHO), 1.d-2)
     q(:,:,:,MP) = max(q(:,:,:,MP), 1.d-2)
 #endif

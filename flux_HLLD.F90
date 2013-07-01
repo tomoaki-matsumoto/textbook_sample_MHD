@@ -1,3 +1,4 @@
+#include "config.h"
 module flux_eos
   use parameter
   implicit none
@@ -291,7 +292,7 @@ contains
     by  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MBY)
     bz  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MBZ)
     ca= sqrt( ( GAMMA*p +(bx**2+by**2+bz**2)*PI4I )/rho ) ! fast wave
-#if _DIRECTIONAL_SPLIT_ == _SPLIT_
+#if defined(DIRECTIONAL_SPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / max( &
             maxval(abs(vx)+ca)/h(MX), &
@@ -306,8 +307,7 @@ contains
     else
        print *, '*** error'
     endif
-#endif
-#if _DIRECTIONAL_SPLIT_ == _UNSPLIT_
+#elif defined(DIRECTIONAL_UNSPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / maxval( &
             (abs(vx)+ca)/h(MX) + &
@@ -322,6 +322,8 @@ contains
     else
        print *, '*** error'
     endif
+#else
+    ERROR
 #endif
   end subroutine cflcond
   !-----------------------------------------------------------------------

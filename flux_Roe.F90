@@ -191,7 +191,7 @@ contains
     vy  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MVY)
     vz  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MVZ)
     cs = sqrt(abs(GAMMA*p/rho))
-#if _DIRECTIONAL_SPLIT_ == _SPLIT_
+#if defined(DIRECTIONAL_SPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / max( &
             maxval(abs(vx)+cs)/h(MX), &
@@ -206,8 +206,7 @@ contains
     else
        print *, '*** error'
     endif
-#endif
-#if _DIRECTIONAL_SPLIT_ == _UNSPLIT_
+#elif defined(DIRECTIONAL_UNSPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / maxval( &
             (abs(vx)+cs)/h(MX) + &
@@ -222,6 +221,8 @@ contains
     else
        print *, '*** error'
     endif
+#else
+    ERROR
 #endif
   end subroutine cflcond
   !-----------------------------------------------------------------------

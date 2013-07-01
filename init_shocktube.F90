@@ -38,20 +38,19 @@ contains
     do k = KMINGH, KMAXGH
        do j = JMINGH, JMAXGH
           do i = IMINGH, IMAXGH
-#if _FLUX_SCHEME_ == _SCALAR_ADVECTION_
+#if defined(FLUX_SCHEME_SCALAR_ADVECTION)
              if ( x(i) <= 0.d0 ) then
                 V(i,j,k,MRHO) = 2.d0
              else
                 V(i,j,k,MRHO) = 1.d0
              endif
-#endif !_SCALAR_ADVECTION_
-#if (_FLUX_SCHEME_ == _HD_) || (_FLUX_SCHEME_ == _MHD_)
+#elif defined(FLUX_SCHEME_HD) || defined(FLUX_SCHEME_MHD)
              if ( x(i) <= 0.d0 ) then
 !!$             if ( x(i) + y(j) <= 0.d0) then
                 V(i,j,k,MRHO) = 1.d0
                 V(i,j,k,MP) = 1.d0
 
-#if _FLUX_SCHEME_ ==  _MHD_
+#if define(FLUX_SCHEME_MHD)
                 V(i,j,k,MBX) = 0.75d0 * SQRTPI4
                 V(i,j,k,MBY) = 1.d0 * SQRTPI4
                 V(i,j,k,MBZ) = 0.d0
@@ -60,7 +59,7 @@ contains
                 V(i,j,k,MRHO) = 0.125d0
                 V(i,j,k,MP) = 0.1d0
 
-#ifdef _FLUX_SCHEME_ ==  _MHD_
+#if defined(FLUX_SCHEME_MHD)
                 V(i,j,k,MBX) = 0.75d0 * SQRTPI4
                 V(i,j,k,MBY) = -1.d0 * SQRTPI4
                 V(i,j,k,MBZ) = 0.d0

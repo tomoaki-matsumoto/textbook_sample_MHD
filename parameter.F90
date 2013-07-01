@@ -19,15 +19,15 @@ module parameter
   integer,parameter :: IMAXGH = IMAX+NGH, JMAXGH = JMAX+NGH, KMAXGH = KMAX+NGH
   integer,parameter :: MX = 0, MY = 1, MZ = 2
   ! for scalar advection
-#if _FLUX_SCHEME_ == _SCALAR_ADVECTION_
+#if defined(FLUX_SCHEME_SCALAR_ADVECTION)
   integer,parameter :: MRHO=0, MMAX = 0
-#endif !_SCALAR_ADVECTION_
   ! for HD
-#if _FLUX_SCHEME_ == _HD_
+#elif defined(FLUX_SCHEME_HD)
   integer,parameter :: MRHO=0, MVX=1, MVY=2, MVZ=3, MP=4, MMAX = 4
-#endif !_HD_
   ! for MHD
-#if _FLUX_SCHEME_ == _MHD_
+#elif defined(FLUX_SCHEME_MHD)
   integer,parameter :: MRHO=0, MVX=1, MVY=2, MVZ=3, MBX=4, MBY=5, MBZ=6, MP=7, MDB=8, MMAX = 8
-#endif !_MHD_
+#else
+  ERROR
+#endif
 end module parameter

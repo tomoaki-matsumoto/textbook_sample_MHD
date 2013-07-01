@@ -37,13 +37,13 @@ contains
     do k = KMINGH, KMAXGH
        Z(k) = (k-kc0) * dz
     end do
-#if _FLUX_SCHEME_ == _HD_
+#ifdef FLUX_SCHEME_HD
     ! define physical variables
     V(:,:,:,MVX)  = 1.d0
     V(:,:,:,MVY)  = 1.d0
     V(:,:,:,MVZ)  = 0.d0
     V(:,:,:,MP)   = 1.d0
-#endif !_HD_
+#endif !FLUX_SCHEME_HD
     V(:,:,:,MRHO) = 1.d0
     do k = KMINGH, KMAXGH
        do j = JMINGH, JMAXGH

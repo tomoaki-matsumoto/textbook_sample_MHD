@@ -1,26 +1,25 @@
 ! Header file for configuration
-#include "constant.h"
 
 ! flux and EOS
-#define _FLUX_SCHEME_ _SCALAR_ADVECTION_
-! #define _FLUX_SCHEME_ _HD_
-! #define _FLUX_SCHEME_ _MHD_
+#define FLUX_SCHEME_SCALAR_ADVECTION
+! #define FLUX_SCHEME_HD
+! #define FLUX_SCHEME_MHD
 
 
-#define _DIRECTIONAL_SPLIT_ _UNSPLIT_
-! #define _DIRECTIONAL_SPLIT_ _SPLIT_
+#define DIRECTIONAL_UNSPLIT
+! #define DIRECTIONAL_SPLIT
 
 
-! #define _TIME_MARCHING_ _EULER_
-! #define _TIME_MARCHING_ _PC2_
-! #define _TIME_MARCHING_ _RK2_
-#define _TIME_MARCHING_ _RK3_
+! #define TIME_MARCHING_EULER
+! #define TIME_MARCHING_PC2
+#define TIME_MARCHING_RK2
+! #define TIME_MARCHING_RK3
 
 
-! #define _RECONSTRUCTION_ _NONE_
-! #define _RECONSTRUCTION_ _MUSCL2_
-#define _RECONSTRUCTION_ _MUSCL3_
+! #define RECONSTRUCTION_NONE
+#define RECONSTRUCTION_MUSCL2
+! #define RECONSTRUCTION_MUSCL3
 
 
-#define _MUSCL2_LIMITER_ _MINMOD_
-! #define _MUSCL2_LIMITER_ _SUPERBEE_
+#define MUSCL2_LIMITER_MINMOD
+! #define MUSCL2_LIMITER_SUPERBEE

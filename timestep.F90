@@ -14,23 +14,23 @@ contains
   ! ---------------------------------------------------------------------------
   subroutine step_full
 
-#if (_DIRECTIONAL_SPLIT_ == _UNSPLIT_) && (_TIME_MARCHING_ == _EULER_)
+#if defined(DIRECTIONAL_UNSPLIT) && defined(TIME_MARCHING_EULER)
     call step_unsplit_euler
 #endif
 
-#if (_DIRECTIONAL_SPLIT_ == _UNSPLIT_) && (_TIME_MARCHING_ == _PC2_)
+#if defined(DIRECTIONAL_UNSPLIT) && defined(TIME_MARCHING_PC2)
     call step_unsplit_pc2
 #endif
 
-#if (_DIRECTIONAL_SPLIT_ == _UNSPLIT_) && (_TIME_MARCHING_ == _RK2_)
+#if defined(DIRECTIONAL_UNSPLIT) && defined(TIME_MARCHING_RK2)
     call step_unsplit_rk2
 #endif
 
-#if (_DIRECTIONAL_SPLIT_ == _UNSPLIT_) && (_TIME_MARCHING_ == _RK3_)
+#if defined(DIRECTIONAL_UNSPLIT) && defined(TIME_MARCHING_RK3)
     call step_unsplit_rk3
 #endif
 
-#if (_DIRECTIONAL_SPLIT_ == _SPLIT_)
+#if defined(DIRECTIONAL_SPLIT)
     call step_split
 #endif
 
@@ -121,26 +121,25 @@ contains
   ! ---------------------------------------------------------------------------
   ! Macro for step_split_1d
   ! ---------------------------------------------------------------------------
-#if _TIME_MARCHING_ == _EULER_
+#if defined(TIME_MARCHING_EULER)
 #define STEP_SPLIT_1D(n) step_split_euler_1d(n)
-#endif
-#if _TIME_MARCHING_ == _PC2_
+#elif defined(TIME_MARCHING_PC2)
 #define STEP_SPLIT_1D(n) step_split_pc2_1d(n)
-#endif
-#if _TIME_MARCHING_ == _RK2_
+#elif defined(TIME_MARCHING_RK2)
 #define STEP_SPLIT_1D(n) step_split_rk2_1d(n)
-#endif
-#if _TIME_MARCHING_ == _RK3_
+#elif defined(TIME_MARCHING_RK3)
 #define STEP_SPLIT_1D(n) step_split_rk3_1d(n)
+#else
+  ERROR
 #endif
   ! ---------------------------------------------------------------------------
   ! fractional time step
   ! ---------------------------------------------------------------------------
   subroutine step_split
-#if _FLUX_SCHEME_ == _MHD_
+#ifdef FLUX_SCHEME_MHD
     use grid, only: V, W, F, Dtime
     use flux_eos, only : source_b, v2u, u2v
-#endif !_MHD_
+#endif !FLUX_SCHEME_MHD
     if (NDIM == 1) then
        call STEP_SPLIT_1D(MX)
     elseif (NDIM == 2) then
@@ -150,11 +149,11 @@ contains
     else
        print *, '*** error in step_fractional'
     endif
-#if _FLUX_SCHEME_ == _MHD_
+#ifdef FLUX_SCHEME_MHD
     call v2u(V, W)
     call source_b(F, W, Dtime)
     call u2v(W, V)
-#endif !_MHD_
+#endif !FLUX_SCHEME_MHD
   end subroutine step_split
   ! ---------------------------------------------------------------------------
   ! fractional time step for 3D
@@ -271,17 +270,17 @@ contains
   ! ---------------------------------------------------------------------------
   subroutine w_update( dt )
     use grid
-#if _FLUX_SCHEME_ == _MHD_
+#ifdef FLUX_SCHEME_MHD
     use flux_eos, only : source_b
-#endif !_MHD_
+#endif !FLUX_SCHEME_MHD
     real(kind=DBL_KIND),intent(IN) :: dt
     integer :: n
     do n = MX, MX+NDIM-1
        call w_update_ndir(dt, n)
     end do
-#if _FLUX_SCHEME_ == _MHD_
+#ifdef FLUX_SCHEME_MHD
     call source_b(F, W, dt)
-#endif !_MHD_
+#endif !FLUX_SCHEME_MHD
   end subroutine w_update
   ! ---------------------------------------------------------------------------
   ! update v by flux for each direction
@@ -311,10 +310,10 @@ contains
   ! ---------------------------------------------------------------------------
 #define MINMOD(x, y) (max(0.d0,min((y)*sign(1.d0,(x)),abs(x)))*sign(1.d0,(x)))
 #define SUPERBEE(x, y) (sign(1.d0,(y))*max(0.d0, min(sign(1.d0,(y))*BW*(x),abs(y)), min(sign(1.d0,(y))*(x),BW*abs(y))))
-#if _MUSCL2_LIMITER_ == _MINMOD_
+#ifdef MUSCL2_LIMITER_MINMOD
 #define FLMT(x, y) MINMOD(x, y)
 #endif
-#if _MUSCL2_LIMITER_ == _SUPERBEE_
+#ifdef MUSCL2_LIMITER_SUPERBEE
 #define FLMT(x, y) SUPERBEE(x, y)
 #endif
   subroutine get_flux_ndir (ndir)
@@ -325,10 +324,10 @@ contains
     real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX) :: f1d, vl, vr
     integer,dimension(MMIN:MMAX) :: mcycle
     integer :: io,jo,ko,i2,j2,k2,i,j,k,m
-#if _RECONSTRUCTION_ == _MUSCL2_
+#ifdef RECONSTRUCTION_MUSCL2
     real(kind=DBL_KIND),parameter :: BW = 2.d0
 #endif
-#if _RECONSTRUCTION_ == _MUSCL3_
+#ifdef RECONSTRUCTION_MUSCL3
     real(kind=DBL_KIND),parameter :: ETA = 1.d0/3.d0 ! 1/3 for 3rd order accuracy in space
     real(kind=DBL_KIND),parameter :: BW = (3.d0-ETA)/(1.d0-ETA)
 !!$    real(kind=DBL_KIND),parameter :: ETA = -1.d0
@@ -344,17 +343,15 @@ contains
        do k = KMIN-ko, KMAX
           do j = JMIN-jo, JMAX
              do i = IMIN-io, IMAX
-#if _RECONSTRUCTION_ == _NONE_
+#if defined(RECONSTRUCTION_NONE)
                 vl(i,j,k,m) = V(i,j,k,m)
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m)
-#endif
-#if _RECONSTRUCTION_ == _MUSCL2_
+#elif defined(RECONSTRUCTION_MUSCL2)
                 vl(i,j,k,m) = V(i,j,k,m) &
                      + (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i,j,k,m)-V(i-io,j-jo,k-ko,m)))*0.5d0
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
                      - (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)))*0.5d0
-#endif
-#if _RECONSTRUCTION_ == _MUSCL3_
+#elif defined(RECONSTRUCTION_MUSCL3)
                 dva = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
                 dvb = V(i,j,k,m) - V(i-io,j-jo,k-ko,m)
                 vl(i,j,k,m) = V(i,j,k,m) &
@@ -365,6 +362,8 @@ contains
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
                      - (1.d0 - ETA)/4.d0 * MINMOD(dva, BW*dvb) &
                      - (1.d0 + ETA)/4.d0 * MINMOD(dvb, BW*dva)
+#else
+                ERROR
 #endif
              enddo
           enddo

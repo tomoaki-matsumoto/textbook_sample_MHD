@@ -1,3 +1,4 @@
+#include "config.h"
 module flux_eos
   use parameter
   implicit none
@@ -37,7 +38,7 @@ contains
     real(kind=DBL_KIND),dimension(:,:,:),pointer :: rho
     h = get_cellWidth()
     rho => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MRHO)
-#if _DIRECTIONAL_SPLIT_ == _SPLIT_
+#if defined(DIRECTIONAL_SPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / CS * min( h(MX), h(MY), h(MZ) )
     elseif (NDIM == 2) then
@@ -47,9 +48,7 @@ contains
     else
        print *, '*** error'
     endif
-#endif
-
-#if _DIRECTIONAL_SPLIT_ == _UNSPLIT_
+#elif defined(DIRECTIONAL_UNSPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / CS /( 1.d0/h(MX) + 1.d0/h(MY) + 1.d0/h(MZ) )
     elseif (NDIM == 2) then
@@ -59,6 +58,8 @@ contains
     else
        print *, '*** error'
     endif
+#else
+    ERROR
 #endif
 
   end subroutine cflcond
