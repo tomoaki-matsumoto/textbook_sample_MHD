@@ -14,7 +14,7 @@ logfile = 'MUSCL3RK3.log'
 ;; logfile = 'AdvMUSCL3RK2.log'
 ;; logfile = 'AdvNoneEuler.log'
 
-;; logfile = 'test.log'
+logfile = 'test.log'
 
 logdir = 'convergence_test'
 
@@ -38,19 +38,23 @@ while ~ eof(unit) do begin
 endwhile
 free_lun, unit
 yrange=[min(l1norm)<min(l2norm)<min(linfnorm), max(linfnorm)>max(l2norm)>max(linfnorm)]
-plot, nz, l1norm, yrange=yrange, /xlog, /ylog
-oplot, nz, l1norm, psym=4
-oplot, nz, l2norm, linestyle=1
-oplot, nz, l2norm, psym=4
-oplot, nz, linfnorm, linestyle=2
-oplot, nz, linfnorm, psym=4
+plot, nz, l1norm, psym=-usrsymbol(10), yrange=yrange, /xlog, /ylog, xtitle='Number of cells', ytitle='Norms of error'
+oplot, nz, l2norm, psym=-7
+oplot, nz, linfnorm, psym=-4
+
 
 np=n_elements(nz)-2
 norm=l1norm
 ; np=0
-oplot, nz, norm[np]*(float(nz[np])/nz)
-oplot, nz, norm[np]*(float(nz[np])/nz)^2
-oplot, nz, norm[np]*(float(nz[np])/nz)^3
+oplot, nz, norm[np]*(float(nz[np])/nz),  linestyle=2
+oplot, nz, norm[np]*(float(nz[np])/nz)^2,linestyle=2
+oplot, nz, norm[np]*(float(nz[np])/nz)^3,linestyle=2
+
+lines=[0, 0, 0, 2]
+psym = [-4, -7, -usrsymbol(10), 0]
+items = ['L'+get_char('infty'), 'L2', 'L1', 'O(n),n=1,2,3']
+astron_legend,items,linestyle=lines, psym=psym, /right, /top
+
 
 end
 

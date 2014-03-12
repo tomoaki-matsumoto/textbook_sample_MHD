@@ -430,6 +430,7 @@ contains
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
                      - (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)))*0.5d0
 #elif defined(RECONSTRUCTION_MUSCL3)
+                ! Computational Gasdynamics, p 581, C. B. Laney (1998)
                 dva = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
                 dvb = V(i,j,k,m) - V(i-io,j-jo,k-ko,m)
                 vl(i,j,k,m) = V(i,j,k,m) &
