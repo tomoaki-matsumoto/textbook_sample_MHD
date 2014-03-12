@@ -7,7 +7,8 @@ dir='DATA'
 ;; dir = 'DATA_unsplit_predictor'
 spawn, 'ls '+dir, r
 fn = r[(size(r))[1]-1]
-fn = 'st000150.d'
+; fn = r[0]
+;; fn = 'st000150.d'
 
 fn = dir +'/'+ fn
 print, fn
@@ -30,9 +31,9 @@ y = y[NGH:JMAX+NGH]
 z = z[NGH:KMAX+NGH]
 q = q[NGH:IMAX+NGH,NGH:JMAX+NGH,NGH:KMAX+NGH,*]
 
-if size(q,/n_dim) eq 1 then begin
+if n_elements(q) eq (IMAX+1)*(MMAX+1) then begin
    mplot=0
-   plot, x, q[*,0,0,mplot] ; , title='1st Order'
+   plot, x, q[*,0,0,mplot],yrange=[min(q[*,0,0,mplot]), max(q[*,0,0,mplot])] ; , title='1st Order'
    oplot, x, q[*,0,0,mplot],psym=4
    oplot,[1,1]*time, [0,3]
 endif else if size(q,/n_dim) eq 2 then begin

@@ -4,6 +4,7 @@ init*
 recl/recltest
 generateTurbulentVelocity*
 a.out
+errornorm
 
 # stag file
 TAGS

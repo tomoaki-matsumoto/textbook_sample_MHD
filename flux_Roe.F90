@@ -1,4 +1,7 @@
 #include "config.h"
+#ifndef FLUX_SCHEME_HD
+ERROR
+#endif
 module flux_eos
   use parameter
   implicit none

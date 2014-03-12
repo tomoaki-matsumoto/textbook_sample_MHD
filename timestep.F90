@@ -30,6 +30,10 @@ contains
     call step_unsplit_rk3
 #endif
 
+#if defined(DIRECTIONAL_UNSPLIT) && defined(TIME_MARCHING_K3)
+    call step_unsplit_k3
+#endif
+
 #if defined(DIRECTIONAL_SPLIT)
     call step_split
 #endif
@@ -58,6 +62,42 @@ contains
     call w_update(Dtime*0.5d0)
     call u2v(W, V)
   end subroutine step_unsplit_rk2
+  ! ---------------------------------------------------------------------------
+  ! 3rd order Runge-Kutta (Kutta method)
+  ! Accuracy is same as that of RK3
+  ! ---------------------------------------------------------------------------
+  subroutine step_unsplit_k3
+    use grid
+    use flux_eos
+    use boundary
+    ! U^(n+1) = U^n + 1/6 (k1 + 4 k2 + k3)
+    ! k1 = dt L^n
+    ! k2 = dt L(U^n + k1 / 2)    = dt L(U*)
+    ! k3 = dt L(U^n - k1 + 2 k2) = dt L(U**)
+    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),target :: k1, k2, k3
+    call v2u(V, U)
+    call boundary_fix(V)
+    call get_flux               ! k1
+    W = 0
+    call w_update(Dtime)        ! W := k1
+    k1 = W
+    W = U + k1/2                ! W := U*
+    call u2v(W, V)              ! V := V*
+    call boundary_fix(V)
+    call get_flux               ! k2
+    W = 0
+    call w_update(Dtime)        ! W := k2
+    k2 = W
+    W = U - k1 + 2 * k2         ! W := U**
+    call u2v(W, V)              ! V := V**
+    call boundary_fix(V)
+    call get_flux               ! k3
+    W = 0
+    call w_update(Dtime)        ! W := k3
+    k3 = W
+    W = U + (k1 + 4*k2 + k3)/6
+    call u2v(W, V)
+  end subroutine step_unsplit_k3
   ! ---------------------------------------------------------------------------
   ! 3rd order Runge-Kutta (see PLUTO users guide)
   ! ---------------------------------------------------------------------------
@@ -129,6 +169,8 @@ contains
 #define STEP_SPLIT_1D(n) step_split_rk2_1d(n)
 #elif defined(TIME_MARCHING_RK3)
 #define STEP_SPLIT_1D(n) step_split_rk3_1d(n)
+#elif defined(TIME_MARCHING_K3)
+#define STEP_SPLIT_1D(n) step_split_k3_1d(n)
 #else
   ERROR
 #endif
@@ -202,6 +244,42 @@ contains
     call w_update_ndir(Dtime*0.5d0, ndir)
     call u2v(W, V)
   end subroutine step_split_rk2_1d
+  ! ---------------------------------------------------------------------------
+  ! 3rd order Runge-Kutta (Kutta method)
+  ! ---------------------------------------------------------------------------
+  subroutine step_split_k3_1d(ndir)
+    use grid
+    use flux_eos
+    use boundary
+    integer,intent(IN) :: ndir
+    ! U^(n+1) = U^n + 1/6 (k1 + 4 k2 + k3)
+    ! k1 = dt L^n
+    ! k2 = dt L(U^n + k1 / 2)    = dt L(U*)
+    ! k3 = dt L(U^n - k1 + 2 k2) = dt L(U**)
+    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),target :: k1, k2, k3
+    call v2u(V, U)
+    call boundary_fix(V)
+    call get_flux_ndir(ndir)    ! k1
+    W = 0
+    call w_update_ndir(Dtime,ndir) ! W := k1
+    k1 = W
+    W = U + k1/2                ! W := U*
+    call u2v(W, V)              ! V := V*
+    call boundary_fix(V)
+    call get_flux_ndir(ndir)    ! k2
+    W = 0
+    call w_update_ndir(Dtime,ndir) ! W := k2
+    k2 = W
+    W = U - k1 + 2 * k2         ! W := U**
+    call u2v(W, V)              ! V := V**
+    call boundary_fix(V)
+    call get_flux_ndir(ndir)    ! k3
+    W = 0
+    call w_update_ndir(Dtime,ndir) ! W := k3
+    k3 = W
+    W = U + (k1 + 4*k2 + k3)/6
+    call u2v(W, V)
+  end subroutine step_split_k3_1d
   ! ---------------------------------------------------------------------------
   ! Runge-Kutta 3 in one dimension
   ! ---------------------------------------------------------------------------

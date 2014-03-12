@@ -1,4 +1,7 @@
 #include "config.h"
+#ifndef FLUX_SCHEME_MHD
+ERROR
+#endif
 #define FLOOR_IN_RHO_P
 ! 密度と圧力に下限値をつける。
 module flux_eos

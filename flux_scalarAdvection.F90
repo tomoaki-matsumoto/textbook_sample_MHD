@@ -1,4 +1,7 @@
 #include "config.h"
+#ifndef FLUX_SCHEME_SCALAR_ADVECTION
+ERROR
+#endif
 module flux_eos
   use parameter
   implicit none

@@ -11,7 +11,9 @@ module parameter
   real(kind=DBL_KIND),parameter :: CFL = 0.5d0
 
   integer,parameter :: NDIM = 2 ! number of dimension
-  integer,parameter :: NX = 128, NY = 128, NZ = 1
+#ifndef CONVERGENCE_TEST
+  integer,parameter :: NX = 64, NY = 64, NZ = 1
+#endif !CONVERGENCE_TEST
   integer,parameter :: IMAX = NX-1, JMAX = NY-1, KMAX = NZ-1
   integer,parameter :: IMIN = 0,   JMIN = 0, KMIN = 0, MMIN = 0
   integer,parameter :: NGH = 2  ! ghostcell

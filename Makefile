@@ -1,9 +1,10 @@
 MAIN        = main
 PARAMETER   = parameter
 GRID        = grid
-BOUNDARY    = boundary_free
-#BOUNDARY    = boundary_periodic
-INIT        = init_advect
+#BOUNDARY    = boundary_free
+BOUNDARY    = boundary_periodic
+INIT        = init_wave
+#INIT        = init_advect
 #INIT        = init_shocktube
 #INIT        = init_Orszag_Tang
 #FLUX        = flux_Roe
@@ -13,9 +14,11 @@ FLUX        = flux_scalarAdvection
 TIMESTEP    = timestep
 UTIL        = util
 IO          = io
+ERRNORM     = errornorm
 
 FC	 = ifort
 FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias
+CPPFLAGS = 
 #FFLAGS =  -traceback -g -warn all -check all -debug all
 
 OBJECT = \
@@ -31,13 +34,24 @@ OBJECT = \
 
 .SUFFIXES:
 .SUFFIXES: .o .f90 .F90
-.f90.o:; $(FC) $(FFLAGS) -c $<
-.F90.o:; $(FC) $(FFLAGS) -c $<
+.f90.o:; $(FC) $(FFLAGS) $(CPPFLAGS) -c $<
+.F90.o:; $(FC) $(FFLAGS) $(CPPFLAGS) -c $<
 
 all : $(MAIN)
 
 $(MAIN): $(OBJECT)
 	$(FC) $(FFLAGS) -o $(MAIN) $(OBJECT)
+
+
+OBJECT_ERRN = \
+	$(PARAMETER).o \
+	$(UTIL).o \
+	$(GRID).o \
+	$(IO).o \
+	$(ERRNORM).o
+
+$(ERRNORM): $(OBJECT_ERRN)
+	$(FC) $(FFLAGS) -o $(ERRNORM) $(OBJECT_ERRN)
 
 $(MAIN).o: $<
 
@@ -57,9 +71,11 @@ $(TIMESTEP).o: $< config.h
 
 $(IO).o: $<
 
+$(ERRNORM).o: $<
+
 clean:
-	-rm $(MAIN) $(OBJECT) *.mod
+	-rm $(MAIN) $(OBJECT) $(ERRNORM) $(OBJECT_ERRN) *.mod
 
 distclean:
-	-rm $(MAIN) $(OBJECT) *.mod *.o
+	-rm $(MAIN) $(OBJECT) $(ERRNORM) $(OBJECT_ERRN) *.mod *.o
 

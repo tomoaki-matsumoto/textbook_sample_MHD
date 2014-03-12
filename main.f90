@@ -8,8 +8,8 @@ program main
   implicit none
   integer,parameter :: STEPMAX = 1000000
 !!$  real(kind=DBL_KIND),parameter :: T_LAST = 0.2d0
-  real(kind=DBL_KIND),parameter :: T_LAST = PI
-!!$  real(kind=DBL_KIND),parameter :: T_LAST = 1.d0
+!!$  real(kind=DBL_KIND),parameter :: T_LAST = PI
+  real(kind=DBL_KIND),parameter :: T_LAST = 1.d0
   logical :: bool_halt = .FALSE.
   character(LEN=STRLEN) :: dir
   Step=0
@@ -28,7 +28,7 @@ program main
      Step = Step + 1
      print *, Step, Dtime, Time
      call step_full
-     if ( mod(Step, 10) == 0 ) call io_writedata(dir)
+!!$     if ( mod(Step, 10) == 0 ) call io_writedata(dir)
      if ( Step >= STEPMAX ) exit
      if ( bool_halt ) exit
   end do
