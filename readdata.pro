@@ -35,7 +35,7 @@ if n_elements(q) eq (IMAX+1)*(MMAX+1) then begin
    mplot=0
    plot, x, q[*,0,0,mplot],yrange=[min(q[*,0,0,mplot]), max(q[*,0,0,mplot])] ; , title='1st Order'
    oplot, x, q[*,0,0,mplot],psym=4
-   oplot,[1,1]*time, [0,3]
+;   oplot,[1,1]*time, [0,3]
 endif else if size(q,/n_dim) eq 2 then begin
    mplot=0
    tvcn, q[*,*,0,mplot], q[*,*,0,mplot], x, y, /noby,/asp, level=[0]

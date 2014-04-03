@@ -29,7 +29,7 @@ unlink "$logdir/$logfile";
 print "$logdir/$logfile\n";
 foreach my $p (@res_pw) {
     my $nx = 2 ** $p;
-    my $cppflags = "\"CPPFLAGS = -DCONVERGENCE_TEST -DNX=$nx -DNY=1 -DNZ=1\"";
+    my $cppflags = "\"CPPFLAGS = -DCONVERGENCE_TEST -DNX=$nx -DNY=1 -DNZ=1 -DNDIM=1\"";
     print $nx, " ";
     system("make clean $devnull");
     system("make $cppflags $devnull");

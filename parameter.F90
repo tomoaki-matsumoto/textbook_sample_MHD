@@ -10,8 +10,8 @@ module parameter
   real(kind=DBL_KIND),parameter :: SQRTPI4 = sqrt(PI4)
   real(kind=DBL_KIND),parameter :: CFL = 0.5d0
 
-  integer,parameter :: NDIM = 2 ! number of dimension
 #ifndef CONVERGENCE_TEST
+  integer,parameter :: NDIM = 2 ! number of dimension
   integer,parameter :: NX = 64, NY = 64, NZ = 1
 #endif !CONVERGENCE_TEST
   integer,parameter :: IMAX = NX-1, JMAX = NY-1, KMAX = NZ-1

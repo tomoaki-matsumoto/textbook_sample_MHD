@@ -412,11 +412,21 @@ contains
 !!$    real(kind=DBL_KIND),parameter :: BW = 1.d0
     real(kind=DBL_KIND) :: dva, dvb
 #endif
+#ifdef RECONSTRUCTION_LIMO3
+    real(kind=DBL_KIND) :: thtL, thtR, duLL, duLR, duRL, duRR, phiL, phiR, etaL, etaR, flagL, flagR
+    real(kind=DBL_KIND),parameter :: rlimit = 1.d0
+    real(kind=DBL_KIND),parameter :: eps = 1.d-20
+    real(kind=DBL_KIND) :: cellWidth(MX:MZ), dx
+#endif
 
     call util_arroffset(ndir,io,jo,ko)
     i2 = io*2
     j2 = jo*2
     k2 = ko*2
+#ifdef RECONSTRUCTION_LIMO3
+    cellWidth=get_cellWidth()
+    dx = cellWidth(ndir)
+#endif
     do m = MMIN, MMAX
        do k = KMIN-ko, KMAX
           do j = JMIN-jo, JMAX
@@ -441,6 +451,23 @@ contains
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
                      - (1.d0 - ETA)/4.d0 * MINMOD(dva, BW*dvb) &
                      - (1.d0 + ETA)/4.d0 * MINMOD(dvb, BW*dva)
+#elif defined(RECONSTRUCTION_LIMO3)
+                duLL = V(i,j,k,m)-V(i-io,j-jo,k-ko,m)
+                duLR = V(i+io,j+jo,k+ko,m)-V(i,j,k,m)
+                duRL = duLR
+                duRR = V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)
+                thtL = duLL/(abs(duLR)+eps)*sign(1.d0,duLR)
+                thtR = duRR/(abs(duRL)+eps)*sign(1.d0,duRL)
+                etaL = (duLL**2 + duLR**2)/(rlimit*dx)**2
+                etaR = (duRL**2 + duRR**2)/(rlimit*dx)**2
+                flagL = 0.5d0+sign(0.5d0,etaL-1.d0) ! if eta > 1 then 1 else 0
+                flagR = 0.5d0+sign(0.5d0,etaL-1.d0) ! if eta > 1 then 1 else 0
+                phiL = flagL * max(0.d0, min((2.d0+thtL)/3.d0, max(-0.5d0*thtL,min(2.d0*thtL,(2.d0+thtL)/3.d0,1.6d0)))) &
+                     + (1.d0-flagL) * (2.d0+thtL)/3.d0
+                phiR = flagR * max(0.d0, min((2.d0+thtR)/3.d0, max(-0.5d0*thtR,min(2.d0*thtR,(2.d0+thtR)/3.d0,1.6d0)))) &
+                     + (1.d0-flagR) * (2.d0+thtR)/3.d0
+                vl(i,j,k,m) = V(i,j,k,m) + 0.5d0*duLR*phiL
+                vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) - 0.5d0*duRL*phiR
 #else
                 ERROR
 #endif

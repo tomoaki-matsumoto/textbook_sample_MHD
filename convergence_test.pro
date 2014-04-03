@@ -2,7 +2,7 @@
 ;
 ;-
 
-logfile = 'MUSCL3RK3.log'
+;; logfile = 'MUSCL3RK3.log'
 ;; logfile = 'MUSCL3RK3splt.log'
 ;; logfile = 'MUSCL3K3.log'
 ;; logfile = 'MUSCL2RK2.log'
