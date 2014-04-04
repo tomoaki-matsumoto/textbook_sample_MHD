@@ -452,6 +452,7 @@ contains
                      - (1.d0 - ETA)/4.d0 * MINMOD(dva, BW*dvb) &
                      - (1.d0 + ETA)/4.d0 * MINMOD(dvb, BW*dva)
 #elif defined(RECONSTRUCTION_LIMO3)
+                ! Cada & Torrilhon (2009), JCP, 228, 4118, 10.1016/j.jcp.2009.02.020
                 duLL = V(i,j,k,m)-V(i-io,j-jo,k-ko,m)
                 duLR = V(i+io,j+jo,k+ko,m)-V(i,j,k,m)
                 duRL = duLR
