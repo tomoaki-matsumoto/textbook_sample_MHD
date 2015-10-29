@@ -16,10 +16,17 @@ UTIL        = util
 IO          = io
 ERRNORM     = errornorm
 
-FC	 = ifort
-FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias
-CPPFLAGS = 
+#### intel fortran (ifort)
+# FC	 = ifort
+# FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias
+# CPPFLAGS = 
 #FFLAGS =  -traceback -g -warn all -check all -debug all
+
+#### gnu gfotran 
+FC	 = gfortran
+FFLAGS = -O3
+CPPFLAGS = 
+
 
 OBJECT = \
 	$(PARAMETER).o \

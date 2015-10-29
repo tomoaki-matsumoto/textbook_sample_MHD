@@ -17,7 +17,7 @@ contains
   !-----------------------------------------------------------------------
   ! get cell width
   !-----------------------------------------------------------------------
-  function get_cellWidth result( r_cellwidth )
+  function get_cellWidth() result( r_cellwidth )
     real(kind=DBL_KIND),dimension(MX:MZ) :: r_cellwidth
     if ( .not. Initialized ) then
        CellWidth(MX) = X(IMIN+1)-X(IMIN)
@@ -30,7 +30,7 @@ contains
   !-----------------------------------------------------------------------
   ! get dv
   !-----------------------------------------------------------------------
-  function get_dv result( dv )
+  function get_dv() result( dv )
     real(kind=DBL_KIND) :: dv
     real(kind=DBL_KIND),dimension(MX:MZ) :: h
     h = get_cellWidth()
@@ -39,7 +39,7 @@ contains
   !-----------------------------------------------------------------------
   ! get ds
   !-----------------------------------------------------------------------
-  function get_ds result( ds )
+  function get_ds() result( ds )
     real(kind=DBL_KIND),dimension(MX:MZ) :: ds
     real(kind=DBL_KIND),dimension(MX:MZ) :: h
     h = get_cellWidth()
