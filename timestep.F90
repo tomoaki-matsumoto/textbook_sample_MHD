@@ -99,7 +99,7 @@ contains
     call u2v(W, V)
   end subroutine step_unsplit_k3
   ! ---------------------------------------------------------------------------
-  ! 3rd order Runge-Kutta (see PLUTO users guide)
+  ! 3rd order Runge-Kutta (see PLUTO users guide, Jiang & Shu (1996) JCP, 126(1), 202
   ! ---------------------------------------------------------------------------
   subroutine step_unsplit_rk3
     use grid
