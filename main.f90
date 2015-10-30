@@ -6,10 +6,6 @@ program main
   use flux_eos
   use timestep
   implicit none
-  integer,parameter :: STEPMAX = 1000000
-!!$  real(kind=DBL_KIND),parameter :: T_LAST = 0.2d0
-!!$  real(kind=DBL_KIND),parameter :: T_LAST = PI
-  real(kind=DBL_KIND),parameter :: T_LAST = 1.d0
   logical :: bool_halt = .FALSE.
   character(LEN=STRLEN) :: dir
   Step=0
