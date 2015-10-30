@@ -5,4 +5,5 @@ make clean
 make
 rm DATA/*
 ./main
+gnuplot plot1d.gp
 
