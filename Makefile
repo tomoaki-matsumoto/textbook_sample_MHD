@@ -7,10 +7,10 @@ INIT        = init_wave
 #INIT        = init_advect
 #INIT        = init_shocktube
 #INIT        = init_Orszag_Tang
+FLUX        = flux_scalarAdvection
 #FLUX        = flux_Roe
 #FLUX        = flux_HLLD
 #FLUX        = flux_HLLD_Boris
-FLUX        = flux_scalarAdvection
 TIMESTEP    = timestep
 UTIL        = util
 IO          = io
@@ -24,7 +24,7 @@ ERRNORM     = errornorm
 
 #### gnu gfotran 
 FC	 = gfortran
-FFLAGS = -O3
+FFLAGS = -O3 -ffree-line-length-none
 CPPFLAGS = 
 
 

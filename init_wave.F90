@@ -12,8 +12,8 @@ contains
     real(kind=DBL_KIND),parameter :: BOXSIZE_X = 1.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
 #if defined(FLUX_SCHEME_SCALAR_ADVECTION)
     real(kind=DBL_KIND),parameter :: CS = 1.d0
-    real(kind=DBL_KIND),parameter :: RHO0 = 1.d0
-    real(kind=DBL_KIND),parameter :: AMPLITUDE=1.d-3
+    real(kind=DBL_KIND),parameter :: RHO0 = 0.d0
+    real(kind=DBL_KIND),parameter :: AMPLITUDE=1.d0
 #elif defined(FLUX_SCHEME_HD)
     real(kind=DBL_KIND),parameter :: CS = 1.d0
     real(kind=DBL_KIND),parameter :: GAMMA = 5.d0/3.d0
