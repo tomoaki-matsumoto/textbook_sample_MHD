@@ -8,7 +8,7 @@ contains
   subroutine init_cond
     use grid
     integer :: i, j, k
-    real(kind=DBL_KIND) :: BOXSIZE_X = 1.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
+    real(kind=DBL_KIND) :: BOXSIZE_X = 5.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
     real(kind=DBL_KIND) :: dx, dy, dz
     real(kind=DBL_KIND) :: bx, by, bz
     real(kind=DBL_KIND) :: ic0, jc0, kc0
@@ -48,6 +48,7 @@ contains
              if ( x(i) <= 0.d0 ) then
 !!$             if ( x(i) + y(j) <= 0.d0) then
                 V(i,j,k,MRHO) = 1.d0
+!                V(i,j,k,MVX) = 0.9d0  ! for entropy fix
                 V(i,j,k,MP) = 1.d0
 
 #if define(FLUX_SCHEME_MHD)
@@ -57,6 +58,7 @@ contains
 #endif !_MHD_
              else
                 V(i,j,k,MRHO) = 0.125d0
+!                V(i,j,k,MVX) = 0.9d0   ! for entropy fix
                 V(i,j,k,MP) = 0.1d0
 
 #if defined(FLUX_SCHEME_MHD)

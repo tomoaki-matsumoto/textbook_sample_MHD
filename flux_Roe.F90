@@ -2,6 +2,7 @@
 #ifndef FLUX_SCHEME_HD
 ERROR
 #endif
+! #define WO_ENTROPY_FIX
 module flux_eos
   use parameter
   implicit none
@@ -32,11 +33,17 @@ contains
   ! get numerical flux in one dimension (RoeM2; Kim et al. 2003, JCP, 185, 342)
   !-----------------------------------------------------------------------
   ! macro for entropy condition
+#ifdef WO_ENTROPY_FIX
+  ! w/o entorpy fix
+#define ELMOD(EL,ELBAR,EL1, EL2) \
+  EL= abs(ELBAR)
+#else !WO_ENTROPY_FIX
 #define ELMOD(EL,ELBAR,EL1, EL2) \
   eps=max(0.d0,((ELBAR)-(EL1)),((EL2)-(ELBAR))) ;\
   x1=0.5+sign(0.5d0,abs(ELBAR)-eps) ;\
   x2=1.d0-x1 ;\
   EL= x1*abs(ELBAR) + x2*0.5d0*((ELBAR)**2/(eps+x1)+eps)
+#endif !WO_ENTROPY_FIX
 
   subroutine flux( ql, qr, f)
     real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: ql  ! (IN)
