@@ -23,4 +23,5 @@ y = y[NGH:JMAX+NGH]
 z = z[NGH:KMAX+NGH]
 v = v[NGH:IMAX+NGH,NGH:JMAX+NGH,NGH:KMAX+NGH,*]
 
+v = reform(v, IMAX+1, JMAX+1, KMAX+1, MMAX+1)
 end
