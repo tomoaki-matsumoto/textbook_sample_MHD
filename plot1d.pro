@@ -13,12 +13,12 @@ file = dir +'/'+fn
 readdatap, file, x, y, z, v, time, step
 
 ; sound speed
-gamma = 5.d0/3.d0
-cs = sqrt(gamma*v[*,*,*,4]/v[*,*,*,0])
-v[*,*,*,1]=v[*,*,*,1]/cs
+;; gamma = 5.d0/3.d0
+;; cs = sqrt(gamma*v[*,*,*,4]/v[*,*,*,0])
+;; v[*,*,*,1]=v[*,*,*,1]/cs
 
 if (size(v))[1] eq n_elements(x) then begin
-   mplot=1
+   mplot=0
    plot, x, v[*,0,0,mplot],yrange=[min(v[*,0,0,mplot]), max(v[*,0,0,mplot])] ; , title='1st Order'
    oplot, x, v[*,0,0,mplot],psym=4
 ;   oplot,[1,1]*time, [0,3]

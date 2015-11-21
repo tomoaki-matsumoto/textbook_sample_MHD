@@ -51,7 +51,12 @@ contains
        do j = JMINGH, JMAXGH
           do i = IMINGH, IMAXGH
 #if defined(FLUX_SCHEME_SCALAR_ADVECTION)
-             V(i,j,k,MRHO) = sin(x(i)/BOXSIZE_X*2.d0*PI)*AMPLITUDE+RHO0
+             V(i,j,k,MRHO) = sin(x(i)/BOXSIZE_X*2.d0*PI)*AMPLITUDE+RHO0 ! sin wave
+!!$             if (abs(X(i)) <= 0.2) then ! square wave
+!!$                V(i,j,k,MRHO) = 1.0
+!!$             else
+!!$                V(i,j,k,MRHO) = 0.0
+!!$             endif
 #elif defined(FLUX_SCHEME_HD)
              V(i,j,k,MRHO) = RHO0 + RHO0*AMPLITUDE*sin(x(i)/BOXSIZE_X*2.d0*PI)
              V(i,j,k,MP)   = P0 + RHO0*CS**2*AMPLITUDE*sin(x(i)/BOXSIZE_X*2.d0*PI)
