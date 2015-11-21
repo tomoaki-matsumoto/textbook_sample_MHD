@@ -21,7 +21,7 @@ program main
 
   normL1 = sum(abs(diff))/size(diff)
   normL2 = sqrt(sum(diff**2)/size(diff))
-  normLinf = maxval(diff)
+  normLinf = maxval(abs(diff))
 
   write(6, '(I5,3E12.5)') NX, normL1, normL2, normLinf
 

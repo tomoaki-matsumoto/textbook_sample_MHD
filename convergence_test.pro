@@ -2,19 +2,25 @@
 ;
 ;-
 
-;; logfile = 'MUSCL3RK3.log'
-;; logfile = 'MUSCL3RK3splt.log'
-;; logfile = 'MUSCL3K3.log'
-;; logfile = 'MUSCL2RK2.log'
-;; logfile = 'MUSCL2PC2.log'
+;;;; Hydrodynamical wave
 ;; logfile = 'NoneEuler.log'
+;; logfile = 'MUSCL2PC2.log'
+;; logfile = 'MUSCL2RK2.log'
 ;; logfile = 'MUSCL3PC2.log'
-;; logfile = 'AdvMUSCL3RK3.log'
-;; logfile = 'AdvMUSCL2RK2.log'
-;; logfile = 'AdvMUSCL3RK2.log'
-;; logfile = 'AdvNoneEuler.log'
+;; logfile = 'MUSCL3RK3.log'
+;; logfile = 'MUSCL3K3.log'
 
-logfile = 'test.log'
+;;;; scalar advection
+;; logfile = 'AdvNoneEuler.log'
+;; logfile = 'AdvMUSCL2Euler.log'
+;; logfile = 'AdvMUSCL2PC2.log'
+logfile = 'AdvSuperBee2PC2.log'
+;; logfile = 'AdvMUSCL2RK2.log'
+;; logfile = 'AdvMUSCL3PC2.log'
+;; logfile = 'AdvMUSCL3RK3.log'
+;; logfile = 'AdvMUSCL3K3.log'
+
+;; logfile = 'test.log'
 
 logdir = 'convergence_test'
 
@@ -38,21 +44,27 @@ while ~ eof(unit) do begin
 endwhile
 free_lun, unit
 yrange=[min(l1norm)<min(l2norm)<min(linfnorm), max(linfnorm)>max(l2norm)>max(linfnorm)]
-plot, nz, l1norm, psym=-usrsymbol(10), yrange=yrange, /xlog, /ylog, xtitle='Number of cells', ytitle='Norms of error'
+yrange=yrange * [0.1^0.1, 10^0.1]
+xrange = [min(nz),max(nz)] * [0.1^0.1, 10^0.1]
+plot, nz, l1norm, psym=usrsymbol(-10), xrange=xrange, yrange=yrange, /xlog, /ylog, xtitle='Number of cells', ytitle='Norms of error', xstyle=1, ystyle=1
 oplot, nz, l2norm, psym=-7
 oplot, nz, linfnorm, psym=-4
 
 
-np=n_elements(nz)-2
-norm=l1norm
+np=n_elements(nz)-1
+;; norm=l1norm
+normmin = l2norm[np]<l1norm[np]<linfnorm[np]
+normmax = l2norm[np]>l1norm[np]>linfnorm[np]
 ; np=0
-oplot, nz, norm[np]*(float(nz[np])/nz),  linestyle=2
-oplot, nz, norm[np]*(float(nz[np])/nz)^2,linestyle=2
-oplot, nz, norm[np]*(float(nz[np])/nz)^3,linestyle=2
+oplot, nz, 10^0.1* normmax*(float(nz[np])/nz),  linestyle=2
+oplot, nz, 0.1^0.2* normmin*(float(nz[np])/nz)^2,linestyle=2
+;; oplot, nz, 0.1^0.1* normmin*(float(nz[np])/nz)^3,linestyle=2
+
+;; oplot, nz, normmax*(float(nz[np])/nz)^1.4,linestyle=2
 
 lines=[0, 0, 0, 2]
-psym = [-4, -7, -usrsymbol(10), 0]
-items = ['L'+get_char('infty'), 'L2', 'L1', 'O(n),n=1,2,3']
+psym = [-4, -7, -10, 0]
+items = ['L'+get_char('infty'), 'L2', 'L1', 'O(n),n=1,2']
 astron_legend,items,linestyle=lines, psym=psym, /right, /top
 
 
