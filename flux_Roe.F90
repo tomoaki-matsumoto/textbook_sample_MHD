@@ -1,14 +1,14 @@
 #include "config.h"
 #ifndef FLUX_SCHEME_HD
-ERROR
+ERROR: this routine is only for FLUX_SCHEME_HD. Check config.h and Makefile.
 #endif
 ! #define WO_ENTROPY_FIX
 module flux_eos
   use parameter
   implicit none
   private
-  real(kind=DBL_KIND),parameter :: GAMMA = 5.d0/3.d0
-!!$  real(kind=DBL_KIND),parameter :: GAMMA = 1.4d0
+!!$  real(kind=DBL_KIND),parameter :: GAMMA = 5.d0/3.d0
+  real(kind=DBL_KIND),parameter :: GAMMA = 1.4d0
   public :: cyclecomp, flux, cflcond, v2u, u2v
 contains
   !-----------------------------------------------------------------------

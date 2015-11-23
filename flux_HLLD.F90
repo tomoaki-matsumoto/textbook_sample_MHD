@@ -1,6 +1,6 @@
 #include "config.h"
 #ifndef FLUX_SCHEME_MHD
-ERROR
+ERROR: this routine is only for FLUX_SCHEME_MHD. Check config.h and Makefile.
 #endif
 module flux_eos
   use parameter

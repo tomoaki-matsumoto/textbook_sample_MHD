@@ -1,4 +1,7 @@
 #include "config.h"
+#ifndef FLUX_SCHEME_MHD
+ERROR: this routine is only for FLUX_SCHEME_MHD. Check config.h and Makefile.
+#endif
 module init
   use parameter
   implicit none
