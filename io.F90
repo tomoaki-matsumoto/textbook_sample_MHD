@@ -64,64 +64,35 @@ contains
   ! ---------------------------------------------------------------------------
   subroutine io_writedata_txt(dir)
     use parameter
-    character(LEN=*),intent(IN) :: dir
-    if (NX /= 1 .and. NY == 1 .and. NZ ==1) then
-       call io_writedata_txt_1d(dir)
-    elseif (NX /= 1 .and. NY /= 1 .and. NZ ==1) then
-       call io_writedata_txt_2d(dir)
-    else
-       print *, '*** This type of text output is not supported.'
-    endif
-  end subroutine io_writedata_txt
-  ! ---------------------------------------------------------------------------
-  subroutine io_writedata_txt_1d(dir)
     use grid
     integer,parameter :: LUN = 11
     character(LEN=*),intent(IN) :: dir
     character(LEN=STRLEN) :: filename
-    integer :: i, m
+    integer :: i, j, k, m
     call mkfilename( filename, suffix='.txt')
     print *, 'Write '//TRIM(filename)
     open(LUN, file=TRIM(dir)//'/'//TRIM(filename))
     write(LUN, '("# time = ", E12.5)') Time
     write(LUN, '("# step = ", I6)') Step
-    write(LUN, '("# imax = ", I6)') IMAX
-    do i = 0, IMAX
-       write(LUN, '(1PE13.5)', advance='no') X(i)
-       do m = MMIN, MMAX
-          write(LUN, '(1PE13.5)', advance='no') V(i,JMIN,KMIN,m)
-       enddo
-       write(LUN, '(A)') ''     ! newline
-    enddo
-    call flush(LUN)
-    close(LUN)
-  end subroutine io_writedata_txt_1d
-  ! ---------------------------------------------------------------------------
-  subroutine io_writedata_txt_2d(dir)
-    use grid
-    integer,parameter :: LUN = 11
-    character(LEN=*),intent(IN) :: dir
-    character(LEN=STRLEN) :: filename
-    integer :: i, j, m
-    call mkfilename( filename, suffix='.txt')
-    print *, 'Write '//TRIM(filename)
-    open(LUN, file=TRIM(dir)//'/'//TRIM(filename))
-    write(LUN, '("# time = ", E12.5)') Time
-    write(LUN, '("# step = ", I6)') Step
-    write(LUN, '("# imax = ", I6)') IMAX
-    write(LUN, '("# jmax = ", I6)') JMAX
-    do j = 0, JMAX
-       do i = 0, IMAX
-          write(LUN, '(1PE13.5)', advance='no') X(i), Y(j)
-          do m = MMIN, MMAX
-             write(LUN, '(1PE13.5)', advance='no') V(i,j,KMIN,m)
+    if (NX /= 1) write(LUN, '("# imax = ", I6)') IMAX
+    if (NY /= 1) write(LUN, '("# jmax = ", I6)') JMAX
+    if (NZ /= 1) write(LUN, '("# kmax = ", I6)') KMAX
+    do k = KMIN, KMAX
+       do j = JMIN, JMAX
+          do i = IMIN, IMAX
+             if (NX /= 1) write(LUN, '(1PE13.5)', advance='no') X(i)
+             if (NY /= 1) write(LUN, '(1PE13.5)', advance='no') Y(j)
+             if (NZ /= 1) write(LUN, '(1PE13.5)', advance='no') Z(k)
+             do m = MMIN, MMAX
+                write(LUN, '(1PE13.5)', advance='no') V(i,j,k,m)
+             enddo
+             write(LUN, '(A)') ''     ! newline
           end do
-          write(LUN, '(A)') ''     ! newline
        end do
     enddo
     call flush(LUN)
     close(LUN)
-  end subroutine io_writedata_txt_2d
+  end subroutine io_writedata_txt
   ! ---------------------------------------------------------------------------
   subroutine mkfilename( filename, prefix, suffix )
     use grid
