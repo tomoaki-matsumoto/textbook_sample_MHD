@@ -26,11 +26,10 @@ contains
     real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: ql  ! (IN)
     real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: qr  ! (IN)
     real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: f   ! (OUT)
-    if (CS <= 0) then
-       f = qr
-    else
-       f = ql
-    endif
+    f = 0.5d0 * CS * (ql + qr) - 0.5d0 * abs(CS) * (qr - ql) ! Up-wind
+    ! f = CS * qr                 !FTFS
+    ! f = CS * ql                 !FTBS
+    ! f = 0.5d0 * CS * (ql + qr)  !FTCS
   end subroutine flux
   !-----------------------------------------------------------------------
   ! find dt according to CFL condtion
@@ -43,21 +42,21 @@ contains
     rho => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MRHO)
 #if defined(DIRECTIONAL_SPLIT)
     if (NDIM == 3) then
-       Dtime = (CFL) / CS * min( h(MX), h(MY), h(MZ) )
+       Dtime = (CFL) / abs(CS) * min( h(MX), h(MY), h(MZ) )
     elseif (NDIM == 2) then
-       Dtime = (CFL) / CS * min( h(MX), h(MY) )
+       Dtime = (CFL) / abs(CS) * min( h(MX), h(MY) )
     elseif (NDIM == 1) then
-       Dtime = (CFL) / CS * h(MX)
+       Dtime = (CFL) / abs(CS) * h(MX)
     else
        print *, '*** error'
     endif
 #elif defined(DIRECTIONAL_UNSPLIT)
     if (NDIM == 3) then
-       Dtime = (CFL) / CS /( 1.d0/h(MX) + 1.d0/h(MY) + 1.d0/h(MZ) )
+       Dtime = (CFL) / abs(CS) /( 1.d0/h(MX) + 1.d0/h(MY) + 1.d0/h(MZ) )
     elseif (NDIM == 2) then
-       Dtime = (CFL) / CS /( 1.d0/h(MX) + 1.d0/h(MY))
+       Dtime = (CFL) / abs(CS) /( 1.d0/h(MX) + 1.d0/h(MY))
     elseif (NDIM == 1) then
-       Dtime = (CFL) * h(MX)/ CS
+       Dtime = (CFL) * h(MX)/ abs(CS)
     else
        print *, '*** error'
     endif

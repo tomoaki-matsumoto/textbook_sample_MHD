@@ -41,9 +41,9 @@ contains
 
 #ifdef FLUX_SCHEME_SCALAR_ADVECTION
              if ( x(i) <= 0.d0 ) then
-                V(i,j,k,MRHO) = 2.d0
-             else
                 V(i,j,k,MRHO) = 1.d0
+             else
+                V(i,j,k,MRHO) = 0.d0
              endif
 #endif !FLUX_SCHEME_SCALAR_ADVECTION
 
