@@ -13,8 +13,12 @@
 # splot "DATA/st000183.txt" using 1:2:3 with lines
 
 ##### 2D image
-set pm3d map
-set size ratio -1
-splot "DATA/st000183.txt" using 1:2:3 with image
+# set pm3d map
+# set size ratio -1
+# splot "DATA/st000183.txt" using 1:2:3 with image
+
+#### contour plot
+
+
 
 pause -1 "press [Enter] key to quit " # prompt

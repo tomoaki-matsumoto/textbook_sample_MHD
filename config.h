@@ -33,6 +33,7 @@
 ! -----------------------------
 ! Limiter for 2nd order MUSCL
 ! -----------------------------
+! #define MUSCL2_WO_LIMITER
 #define MUSCL2_LIMITER_MINMOD
 ! #define MUSCL2_LIMITER_SUPERBEE
 

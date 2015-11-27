@@ -3,10 +3,12 @@ PARAMETER   = parameter
 GRID        = grid
 #BOUNDARY    = boundary_free
 BOUNDARY    = boundary_periodic
+#BOUNDARY    = boundary_windTunnel
 INIT        = init_wave
 #INIT        = init_advect
 #INIT        = init_shocktube
 #INIT        = init_Orszag_Tang
+#INIT        = init_windTunnel
 FLUX        = flux_scalarAdvection
 #FLUX        = flux_Roe
 #FLUX        = flux_HLLD
@@ -14,13 +16,15 @@ FLUX        = flux_scalarAdvection
 TIMESTEP    = timestep
 UTIL        = util
 IO          = io
+CURE        = cure_crash
 ERRNORM     = errornorm
+
 
 #### intel fortran (ifort)
 # FC	 = ifort
 # FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias
 # CPPFLAGS = 
-#FFLAGS =  -traceback -g -warn all -check all -debug all
+# FFLAGS =  -traceback -g -warn all -check all -debug all
 
 #### gnu gfotran 
 FC	 = gfortran
@@ -32,6 +36,7 @@ OBJECT = \
 	$(PARAMETER).o \
 	$(UTIL).o \
 	$(GRID).o \
+	$(CURE).o \
 	$(BOUNDARY).o \
 	$(FLUX).o \
 	$(TIMESTEP).o \
@@ -64,19 +69,21 @@ $(MAIN).o: $<
 
 $(GRID).o: $<
 
-$(PARAMETER).o: $<
+$(PARAMETER).o: $< config.h
 
 $(UTIL).o: $<
 
-$(BOUNDARY).o: $<
+$(BOUNDARY).o: $< config.h
 
 $(INIT).o: $< config.h
 
-$(FLUX).o: $<
+$(FLUX).o: $< config.h
 
 $(TIMESTEP).o: $< config.h
 
-$(IO).o: $<
+$(IO).o: $< config.h
+
+$(CURE).o: $< config.h
 
 $(ERRNORM).o: $<
 

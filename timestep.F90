@@ -61,6 +61,7 @@ contains
     W = (U + W)*0.5d0
     call w_update(Dtime*0.5d0)
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_unsplit_rk2
   ! ---------------------------------------------------------------------------
   ! 3rd order Runge-Kutta (Kutta method)
@@ -97,6 +98,7 @@ contains
     k3 = W
     W = U + (k1 + 4*k2 + k3)/6
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_unsplit_k3
   ! ---------------------------------------------------------------------------
   ! 3rd order Runge-Kutta (see PLUTO users guide, Jiang & Shu (1996) JCP, 126(1), 202
@@ -124,6 +126,7 @@ contains
     W = ( U + 2.d0*W ) /3.d0
     call w_update(Dtime * 2.d0/3.d0)
     call u2v(W, V)              ! V := V**
+    call boundary_fix(V)
   end subroutine step_unsplit_rk3
   ! ---------------------------------------------------------------------------
   ! 2nd order method: unsplit predictor-corrector (equivalent to RK2 alpha=1/2)
@@ -143,6 +146,7 @@ contains
     W = U
     call w_update(Dtime)
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_unsplit_pc2
   ! ---------------------------------------------------------------------------
   ! 1st order method: euler method
@@ -157,6 +161,7 @@ contains
     W = U
     call w_update(Dtime)
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_unsplit_euler
   ! ---------------------------------------------------------------------------
   ! Macro for step_split_1d
@@ -243,6 +248,7 @@ contains
     W = (U + W)*0.5d0
     call w_update_ndir(Dtime*0.5d0, ndir)
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_split_rk2_1d
   ! ---------------------------------------------------------------------------
   ! 3rd order Runge-Kutta (Kutta method)
@@ -279,6 +285,7 @@ contains
     k3 = W
     W = U + (k1 + 4*k2 + k3)/6
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_split_k3_1d
   ! ---------------------------------------------------------------------------
   ! Runge-Kutta 3 in one dimension
@@ -304,6 +311,7 @@ contains
     W = ( U + 2.d0*W ) /3.d0
     call w_update_ndir(Dtime * 2.d0/3.d0, ndir)
     call u2v(W, V)              ! V := V**
+    call boundary_fix(V)
   end subroutine step_split_rk3_1d
   ! ---------------------------------------------------------------------------
   ! predictor corrector in one dimension
@@ -326,6 +334,7 @@ contains
     W = U
     call w_update_ndir(Dtime, ndir)
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_split_pc2_1d
   ! ---------------------------------------------------------------------------
   ! Eular method in one dimension
@@ -342,6 +351,7 @@ contains
     W = U
     call w_update_ndir(Dtime, ndir)
     call u2v(W, V)
+    call boundary_fix(V)
   end subroutine step_split_euler_1d
   ! ---------------------------------------------------------------------------
   ! update u by flux for all directions
@@ -393,6 +403,9 @@ contains
 #endif
 #ifdef MUSCL2_LIMITER_SUPERBEE
 #define FLMT(x, y) SUPERBEE(x, y)
+#endif
+#ifdef MUSCL2_WO_LIMITER
+#define FLMT(x, y) (y)
 #endif
   subroutine get_flux_ndir (ndir)
     use util

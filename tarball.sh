@@ -4,7 +4,7 @@
 make distclean > /dev/null 2>&1 
 SUBDIR=`basename $PWD`
 TARBALL=$SUBDIR.tar.gz
-flist="Makefile *.F90 *.f90 *.h *.sh *.pro *.gp"
+flist="Makefile *.F90 *.f90 *.h *.sh *.pro *.gp *.txt"
 mkdir -p $SUBDIR
 cp -p $flist $SUBDIR
 tar cvfz $TARBALL $SUBDIR
