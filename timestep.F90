@@ -492,7 +492,7 @@ contains
     mcycle = cyclecomp( ndir )
     vl = vl(:,:,:,mcycle)
     vr = vr(:,:,:,mcycle)
-    call flux(vl, vr, f1d)
+    call flux(vl, vr, f1d, ndir)
     F(:,:,:,mcycle,ndir) = f1d(:,:,:,:)
 
   end subroutine get_flux_ndir

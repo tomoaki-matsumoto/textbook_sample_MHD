@@ -22,14 +22,27 @@ contains
   !-----------------------------------------------------------------------
   ! get numerical flux in one dimension
   !-----------------------------------------------------------------------
-  subroutine flux( ql, qr, f)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: ql  ! (IN)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: qr  ! (IN)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: f   ! (OUT)
-    f = 0.5d0 * CS * (ql + qr) - 0.5d0 * abs(CS) * (qr - ql) ! Up-wind
-    ! f = CS * qr                 !FTFS
-    ! f = CS * ql                 !FTBS
-    ! f = 0.5d0 * CS * (ql + qr)  !FTCS
+  subroutine flux( ql, qr, f, ndir )
+    use util
+    use parameter
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: ql  ! (IN)
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: qr  ! (IN)
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: f   ! (OUT)
+    integer,intent(IN) :: ndir
+    integer :: m,i,j,k, io, jo, ko
+    call util_arroffset(ndir,io,jo,ko)
+    do m = MMIN, MMAX
+       do k = KMIN-ko, KMAX
+          do j = JMIN-jo, JMAX
+             do i = IMIN-io, IMAX
+                f(i,j,k,m) = 0.5d0 * CS * (ql(i,j,k,m) + qr(i,j,k,m)) - 0.5d0 * abs(CS) * (qr(i,j,k,m) - ql(i,j,k,m)) ! Up-wind
+                ! f(i,j,k,m) = CS * qr(i,j,k,m)                 !FTFS
+                ! f(i,j,k,m) = CS * ql(i,j,k,m)                 !FTBS
+                ! f(i,j,k,m) = 0.5d0 * CS * (ql(i,j,k,m) + qr(i,j,k,m))  !FTCS
+             end do
+          end do
+       end do
+    end do
   end subroutine flux
   !-----------------------------------------------------------------------
   ! find dt according to CFL condtion

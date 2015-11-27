@@ -46,11 +46,15 @@ contains
   ! SWR(A, B) = 1.d0 if A * B < 0, otherwise 0.d0
 #define SWR(A, B)  (0.5d0 - 0.5d0*sign(1.d0, (A))*sign(1.d0, (B)))
 
-  subroutine flux( ql, qr, f)
+  subroutine flux( ql, qr, f, ndir)
     use grid, only : get_cellWidth, Dtime
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: ql  ! (IN)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: qr  ! (IN)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: f   ! (OUT)
+    use util
+    use parameter
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: ql  ! (IN)
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: qr  ! (IN)
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: f   ! (OUT)
+    integer,intent(IN) :: ndir
+    integer :: i,j,k, io, jo, ko
     real(kind=DBL_KIND) :: sw_deg_l, sw_deg_r, swl, swr, swal, swar, swml, swmr, swt
     real(kind=DBL_KIND),parameter :: eps = 1.D-6
     integer :: i,j,k, is,js,ks,ie,je,ke
@@ -76,19 +80,13 @@ contains
     h = get_cellWidth()
     Ch = (CFL) * minval(h) / Dtime / 3.d0
 
-    is = max( lbound(ql,1), lbound(qr,1), lbound(f,1) )
-    js = max( lbound(ql,2), lbound(qr,2), lbound(f,2) )
-    ks = max( lbound(ql,3), lbound(qr,3), lbound(f,3) )
-    ie = min( ubound(ql,1), ubound(qr,1), ubound(f,1) )
-    je = min( ubound(ql,2), ubound(qr,2), ubound(f,2) )
-    ke = min( ubound(ql,3), ubound(qr,3), ubound(f,3) )
-
     gm1i = 1.d0/(GAMMA - 1)
     sqrtpi4i = sqrt(PI4I)
     sqrtpi4 = sqrt(PI4)
-    do k = ks, ke
-       do j = js, je
-          do i = is, ie
+    call util_arroffset(ndir,io,jo,ko)
+    do k = KMIN-ko, KMAX
+       do j = JMIN-jo, JMAX
+          do i = IMIN-io, IMAX
              ! -------------------------
              ! add-on for div B cleaning
              ! -------------------------
@@ -104,26 +102,26 @@ contains
              ! --------------------
              ! U_L; left variables
              ! --------------------
-             rhol = abs(ql(i,j,k,MRHO)) ! 袖の未定義値参照でお亡くらないように。
+             rhol = ql(i,j,k,MRHO)
              ul = ql(i,j,k,MVX)
              vl = ql(i,j,k,MVY)
              wl = ql(i,j,k,MVZ)
              byl = ql(i,j,k,MBY)*sqrtpi4i
              bzl = ql(i,j,k,MBZ)*sqrtpi4i
-             pl = abs(ql(i,j,k,MP))
+             pl = ql(i,j,k,MP)
              pbl = (bxm2 + byl**2 + bzl**2)*0.5d0
              ptl = pl + pbl
              el = rhol * (ul**2 + vl**2 + wl**2) * 0.5d0 + pbl + pl*gm1i
              ! ---------------------
              ! U_R; right variables
              ! ---------------------
-             rhor = abs(qr(i,j,k,MRHO)) ! 袖の未定義値参照でお亡くらないように。
+             rhor = qr(i,j,k,MRHO)
              ur = qr(i,j,k,MVX)
              vr = qr(i,j,k,MVY)
              wr = qr(i,j,k,MVZ)
              byr = qr(i,j,k,MBY)*sqrtpi4i
              bzr = qr(i,j,k,MBZ)*sqrtpi4i
-             pr = abs(qr(i,j,k,MP))
+             pr = qr(i,j,k,MP)
              pbr = (bxm2 + byr**2 + bzr**2)*0.5d0
              ptr = pr + pbr
              er = rhor * (ur**2 + vr**2 + wr**2) * 0.5d0 + pbr + pr*gm1i
@@ -418,7 +416,7 @@ contains
   subroutine get_cs(c, rho, p)
     real(kind=DBL_KIND),intent(OUT) :: c
     real(kind=DBL_KIND),intent(IN) :: rho, p
-    c = sqrt(abs(GAMMA*p/rho))
+    c = sqrt(GAMMA*p/rho)
   end subroutine get_cs
 
 

@@ -45,11 +45,14 @@ contains
   EL= x1*abs(ELBAR) + x2*0.5d0*((ELBAR)**2/(eps+x1)+eps)
 #endif !WO_ENTROPY_FIX
 
-  subroutine flux( ql, qr, f)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: ql  ! (IN)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: qr  ! (IN)
-    real(kind=DBL_KIND),dimension(:,:,:,MMIN:) :: f   ! (OUT)
-    integer :: i,j,k, is,js,ks,ie,je,ke
+  subroutine flux( ql, qr, f, ndir)
+    use util
+    use parameter
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: ql  ! (IN)
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: qr  ! (IN)
+    real(kind=DBL_KIND),dimension(IMINGH:,JMINGH:,KMINGH:,MMIN:) :: f   ! (OUT)
+    integer,intent(IN) :: ndir
+    integer :: i,j,k, io, jo, ko
     real(kind=DBL_KIND) :: &
          rhol,ul,vl,wl,pl,hl,el,cl, &
          rhor,ur,vr,wr,pr,hr,er,cr, &
@@ -61,36 +64,30 @@ contains
          fl1,fl2,fl3,fl4,fl5, &
          fr1,fr2,fr3,fr4,fr5 
     real(kind=DBL_KIND) :: eps, x1, x2
-    is = max( lbound(ql,1), lbound(qr,1), lbound(f,1) )
-    js = max( lbound(ql,2), lbound(qr,2), lbound(f,2) )
-    ks = max( lbound(ql,3), lbound(qr,3), lbound(f,3) )
-    ie = min( ubound(ql,1), ubound(qr,1), ubound(f,1) )
-    je = min( ubound(ql,2), ubound(qr,2), ubound(f,2) )
-    ke = min( ubound(ql,3), ubound(qr,3), ubound(f,3) )
-
-    do k = ks, ke
-       do j = js, je
-          do i = is, ie
+    call util_arroffset(ndir,io,jo,ko)
+    do k = KMIN-ko, KMAX
+       do j = JMIN-jo, JMAX
+          do i = IMIN-io, IMAX
              gm1 = GAMMA - 1
              ! --------------
              ! left variables
              ! --------------
-             rhol = abs(ql(i,j,k,MRHO)) ! 袖の未定義値参照でお亡くらないように。
+             rhol = ql(i,j,k,MRHO)
              ul = ql(i,j,k,MVX)
              vl = ql(i,j,k,MVY)
              wl = ql(i,j,k,MVZ)
-             pl = abs(ql(i,j,k,MP))
+             pl = ql(i,j,k,MP)
              el = rhol * (ul**2 + vl**2 + wl**2) / 2 + pl / gm1
              hl = ( el + pl )/rhol
              cl = sqrt( GAMMA * pl / rhol )
              ! --------------
              ! right variables
              ! --------------
-             rhor = abs(qr(i,j,k,MRHO))
+             rhor = qr(i,j,k,MRHO)
              ur = qr(i,j,k,MVX)
              vr = qr(i,j,k,MVY)
              wr = qr(i,j,k,MVZ)
-             pr = abs(qr(i,j,k,MP))
+             pr = qr(i,j,k,MP)
              er = rhor * (ur**2 + vr**2 + wr**2) / 2 + pr / gm1
              hr = ( er + pr )/rhor
              cr = sqrt( GAMMA * pr / rhor )
@@ -200,7 +197,7 @@ contains
     vx  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MVX)
     vy  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MVY)
     vz  => V(IMIN:IMAX,JMIN:JMAX,KMIN:KMAX,MVZ)
-    cs = sqrt(abs(GAMMA*p/rho))
+    cs = sqrt(GAMMA*p/rho)
 #if defined(DIRECTIONAL_SPLIT)
     if (NDIM == 3) then
        Dtime = (CFL) / max( &
@@ -276,7 +273,7 @@ contains
     real(kind=DBL_KIND),intent(OUT) :: c
     real(kind=DBL_KIND),intent(IN) :: rho, p
     real(kind=DBL_KIND) :: flag
-    c = sqrt(abs(GAMMA*p/rho))
+    c = sqrt(GAMMA*p/rho)
   end subroutine get_cs
 
 
