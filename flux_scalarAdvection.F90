@@ -33,6 +33,7 @@ contains
     call util_arroffset(ndir,io,jo,ko)
     do m = MMIN, MMAX
        do k = KMIN-ko, KMAX
+!$omp parallel do private(i)
           do j = JMIN-jo, JMAX
              do i = IMIN-io, IMAX
                 f(i,j,k,m) = 0.5d0 * CS * (ql(i,j,k,m) + qr(i,j,k,m)) - 0.5d0 * abs(CS) * (qr(i,j,k,m) - ql(i,j,k,m)) ! Up-wind
@@ -41,6 +42,7 @@ contains
                 ! f(i,j,k,m) = 0.5d0 * CS * (ql(i,j,k,m) + qr(i,j,k,m))  !FTCS
              end do
           end do
+!$omp end parallel do
        end do
     end do
   end subroutine flux

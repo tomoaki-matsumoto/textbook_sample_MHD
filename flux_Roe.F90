@@ -30,7 +30,7 @@ contains
     endif
   end function cyclecomp
   !-----------------------------------------------------------------------
-  ! get numerical flux in one dimension (RoeM2; Kim et al. 2003, JCP, 185, 342)
+  ! get numerical flux in one dimension
   !-----------------------------------------------------------------------
   ! macro for entropy condition
 #ifdef WO_ENTROPY_FIX
@@ -66,6 +66,7 @@ contains
     real(kind=DBL_KIND) :: eps, x1, x2
     call util_arroffset(ndir,io,jo,ko)
     do k = KMIN-ko, KMAX
+!$omp parallel do private(i,gm1,rhol,ul,vl,wl,pl,el,hl,cl,rhor,ur,vr,wr,pr,er,hr,cr,dq1,dq2,dq3,dq4,dq5,sql,sqr,sqa,rhob,ub,vb,wb,hb,ub2,vb2,wb2,qb2,cb2,cb,cb24i,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,w1,w2,w3,w4,w5,fl1,fl2,fl3,fl4,fl5,fr1,fr2,fr3,fr4,fr5)
        do j = JMIN-jo, JMAX
           do i = IMIN-io, IMAX
              gm1 = GAMMA - 1
@@ -180,6 +181,7 @@ contains
 
           enddo
        enddo
+!$omp end parallel do
     enddo
   end subroutine flux
   !-----------------------------------------------------------------------

@@ -1,3 +1,4 @@
+
 #include "config.h"
 module init
   use parameter
@@ -8,7 +9,12 @@ contains
   subroutine init_cond
     use grid
     integer :: i, j, k
+#ifdef FLUX_SCHEME_MHD
+    ! Brio & Wu (1988)
+    real(kind=DBL_KIND) :: BOXSIZE_X = 10.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
+#else
     real(kind=DBL_KIND) :: BOXSIZE_X = 5.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
+#endif
     real(kind=DBL_KIND) :: dx, dy, dz
     real(kind=DBL_KIND) :: bx, by, bz
     real(kind=DBL_KIND) :: ic0, jc0, kc0
@@ -61,6 +67,7 @@ contains
 #endif !FLUX_SCHEME_HD
 
 
+             ! Brio & Wu (1988)
 #ifdef FLUX_SCHEME_MHD
              if ( x(i) <= 0.d0 ) then
                 V(i,j,k,MRHO) = 1.d0

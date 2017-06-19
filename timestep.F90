@@ -442,6 +442,13 @@ contains
 #endif
     do m = MMIN, MMAX
        do k = KMIN-ko, KMAX
+#if defined(RECONSTRUCTION_MUSCL3)
+!$omp parallel do private(i,dva,dvb)
+#elif defined(RECONSTRUCTION_LIMO3)
+!$omp parallel do private(i,duLL,duLR,duRL,duRR,thtL,thtR,etaL,etaR,flagL,flagR,phiL,phiR)
+#else
+!$omp parallel do private(i)
+#endif
           do j = JMIN-jo, JMAX
              do i = IMIN-io, IMAX
 #if defined(RECONSTRUCTION_NONE)
@@ -487,6 +494,7 @@ contains
 #endif
              enddo
           enddo
+!$omp end parallel do
        enddo
     enddo
     mcycle = cyclecomp( ndir )

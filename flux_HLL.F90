@@ -29,14 +29,12 @@ contains
     endif
   end function cyclecomp
   !-----------------------------------------------------------------------
-  ! get numerical flux in one dimension (RoeM2; Kim et al. 2003, JCP, 185, 342)
+  ! get numerical flux in one dimension
   !-----------------------------------------------------------------------
-  ! macro for entropy condition
-#define ELMOD(EL,ELBAR,EL1, EL2) \
-  eps=max(0.d0,((ELBAR)-(EL1)),((EL2)-(ELBAR))) ;\
-  x1=0.5+sign(0.5d0,abs(ELBAR)-eps) ;\
-  x2=1.d0-x1 ;\
-  EL= x1*abs(ELBAR) + x2*0.5d0*((ELBAR)**2/(eps+x1)+eps)
+  ! SWD(A, B) = 1.d0  if A >= B. otherwise 0.d0
+#define SWD(A, B)  (0.5d0 + 0.5d0*sign(1.d0, (A)-(B)))
+  ! SWR(A, B) = 1.d0 if A * B < 0, otherwise 0.d0
+#define SWR(A, B)  (0.5d0 - 0.5d0*sign(1.d0, (A))*sign(1.d0, (B)))
 
   subroutine flux( ql, qr, f, ndir)
     use util
@@ -49,15 +47,17 @@ contains
     real(kind=DBL_KIND) :: &
          rhol,ul,vl,wl,pl,hl,el,cl, &
          rhor,ur,vr,wr,pr,hr,er,cr, &
-         drho, drhou, drhov, drhow, drhoh, dp, dh, du, dv, dw, &
-         sql,sqr,sqa,rhob,ub,vb,wb,hb,qb2,cb2,cb,ub2,vb2,wb2, &
-         gm1,mn, b1, b2, b1b2, db12, pratio, ff, gg, rbdq, &
+         el1,el2,el3,el4,el5, &
          fl1,fl2,fl3,fl4,fl5, &
-         fr1,fr2,fr3,fr4,fr5 
-!!$    real(kind=DBL_KIND) :: el4c, a7c, a8c, a9c, w1c 
-    real(kind=DBL_KIND) :: eps, x1, x2
+         fr1,fr2,fr3,fr4,fr5 ,&
+         fa1,fa2,fa3,fa4,fa5 ,&
+         ul1,ul2,ul3,ul4,ul5, &
+         ur1,ur2,ur3,ur4,ur5 ,&
+         ua1,ua2,ua3,ua4,ua5 ,&
+         csl, csr, gm1, sr, sl
     call util_arroffset(ndir,io,jo,ko)
     do k = KMIN-ko, KMAX
+!$omp parallel do private(i,gm1,rhol,ul,vl,wl,pl,el,hl,cl,rhor,ur,vr,wr,pr,er,hr,cr,ul1,ul2,ul3,ul4,ul5,fl1,fl2,fl3,fl4,fl5,ur1,ur2,ur3,ur4,ur5,fr1,fr2,fr3,fr4,fr5,sl,sr)
        do j = JMIN-jo, JMAX
           do i = IMIN-io, IMAX
              gm1 = GAMMA - 1
@@ -83,85 +83,45 @@ contains
              er = rhor * (ur**2 + vr**2 + wr**2) / 2 + pr / gm1
              hr = ( er + pr )/rhor
              cr = sqrt( GAMMA * pr / rhor )
-             ! -------
-             ! delta Q
-             ! -------
-             drho = rhor - rhol
-             drhou = rhor * ur - rhol * ul
-             drhov = rhor * vr - rhol * vl
-             drhow = rhor * wr - rhol * wl
-             drhoh = rhor * hr - rhol * hl
-             du = ur - ul
-             dv = vr - vl
-             dw = wr - wl
-             dp = pr - pl
-             dh = hr - hl
-             ! ----------------------
-             ! intermidiate variables
-             ! ----------------------
-             sql = sqrt(rhol)
-             sqr = sqrt(rhor)
-             sqa = sql + sqr
-             rhob = sql * sqr
-             ub = (sql * ul + sqr * ur) / sqa
-             vb = (sql * vl + sqr * vr) / sqa
-             wb = (sql * wl + sqr * wr) / sqa
-             hb = (sql * hl + sqr * hr) / sqa
-             ub2 = ub**2
-             vb2 = vb**2
-             wb2 = wb**2
-             qb2 = ub2 + vb2 + wb2
-             cb2 = gm1*(hb - qb2/2)
-             cb  =  sqrt( cb2 )
-             mn = abs(ub/cb)         !Mach number
-
-             ! 
-             b1 = max(0.d0, ub+cb, ur+cb)
-             b2 = min(0.d0, ub-cb, ul-cb)
-             b1b2 = b1 * b2
-             db12 = b1 - b2
-             pratio = min(pr/pl, pl/pr)
-             if (mn == 0.d0) then
-                ff = 1.d0
-             else
-                ff = mn**(1.d0-pratio)
-             endif
-             gg = ff
-             rbdq = drho - ff * dp / cb2
-             ! ---------
-             ! FL and FR
-             ! ---------
-             fl1 = rhol * ul
-             fl2 = fl1 * ul + pl
-             fl3 = fl1 * vl
-             fl4 = fl1 * wl
-             fl5 = ul * ( el + pl )
-
-             fr1 = rhor * ur
-             fr2 = fr1 * ur + pr
-             fr3 = fr1 * vr
-             fr4 = fr1 * wr
-             fr5 = ur * ( er + pr )
+             ! UL
+             ul1 = rhol
+             ul2 = rhol*ul
+             ul3 = rhol*vl
+             ul4 = rhol*wl
+             ul5 = el
+             ! FL
+             fl1 = rhol*ul
+             fl2 = fl1*ul + pl
+             fl3 = fl1*vl
+             fl4 = fl1*wl
+             fl5 = fl1*hl
+             ! UR
+             ur1 = rhor
+             ur2 = rhor*ur
+             ur3 = rhor*vr
+             ur4 = rhor*wr
+             ur5 = er
+             ! FR
+             fr1 = rhor*ur
+             fr2 = fr1*ur + pr
+             fr3 = fr1*vr
+             fr4 = fr1*wr
+             fr5 = fr1*hr
+             ! speed
+             sl = min(ul-cl, ur-cr, 0.d0)
+             sr = max(ul+cl, ur+cr, 0.d0)
              ! -----------------
-             ! intermidiate flux
+             ! flux
              ! -----------------
-             f(i,j,k,MRHO) = (b1*fl1 - b2*fr1)/db12 &
-                  + b1b2/db12 * drho &
-                  - gg * b1b2/db12 / (1.d0 + mn) * rbdq
-             f(i,j,k,MVX)  = (b1*fl2 - b2*fr2)/db12 &
-                  + b1b2/db12 * drhou &
-                  - gg * b1b2/db12 / (1.d0 + mn) * rbdq * ub
-             f(i,j,k,MVY)  = (b1*fl3 - b2*fr3)/db12 &
-                  + b1b2/db12 * drhov &
-                  - gg * b1b2/db12 / (1.d0 + mn) * (rbdq * vb + rhob * dv)
-             f(i,j,k,MVZ)  = (b1*fl4 - b2*fr4)/db12 &
-                  + b1b2/db12 * drhow &
-                  - gg * b1b2/db12 / (1.d0 + mn) * (rbdq * wb + rhob * dw)
-             f(i,j,k,MP)  = (b1*fl5 - b2*fr5)/db12 &
-                  + b1b2/db12 * drhoh &
-                  - gg * b1b2/db12 / (1.d0 + mn) * (rbdq * hb + rhob * dh)
+             f(i,j,k,MRHO) = (sr*fl1 - sl*fr1 + sr*sl*(ur1 - ul1))/(sr-sl)
+             f(i,j,k,MVX)  = (sr*fl2 - sl*fr2 + sr*sl*(ur2 - ul2))/(sr-sl)
+             f(i,j,k,MVY)  = (sr*fl3 - sl*fr3 + sr*sl*(ur3 - ul3))/(sr-sl)
+             f(i,j,k,MVZ)  = (sr*fl4 - sl*fr4 + sr*sl*(ur4 - ul4))/(sr-sl)
+             f(i,j,k,MP)   = (sr*fl5 - sl*fr5 + sr*sl*(ur5 - ul5))/(sr-sl)
+
           enddo
        enddo
+!$omp end parallel do
     enddo
   end subroutine flux
   !-----------------------------------------------------------------------

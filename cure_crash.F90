@@ -20,6 +20,7 @@ contains
 #define VY(i,j,k) u(i,j,k,MVY)
 #define VZ(i,j,k) u(i,j,k,MVZ)
     do k=KMIN,KMAX
+!$omp parallel do private(i,is,ie,js,je,ks,ke,ncell,rho_ave,p_ave,vx_ave,vy_ave,vz_ave)
        do j=JMIN,JMAX
           do i=IMIN,IMAX
              if (RHO(i,j,k) <= FLOOR_RHO .or. P(i,j,k) <= FLOOR_P)then 

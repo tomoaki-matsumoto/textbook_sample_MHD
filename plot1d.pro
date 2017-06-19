@@ -18,7 +18,7 @@ readdatap, file, x, y, z, v, time, step
 ;; v[*,*,*,1]=v[*,*,*,1]/cs
 
 if (size(v))[1] eq n_elements(x) then begin
-   mplot=0
+   mplot=1
    plot, x, v[*,0,0,mplot],yrange=[min(v[*,0,0,mplot]), max(v[*,0,0,mplot])] ; , title='1st Order'
    oplot, x, v[*,0,0,mplot],psym=4
 ;   oplot,[1,1]*time, [0,3]

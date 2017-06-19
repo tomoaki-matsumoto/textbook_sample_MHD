@@ -12,12 +12,14 @@ module parameter
 
   ! Condition for a halt
   integer,parameter :: STEPMAX = 1000000
-!!$  real(kind=DBL_KIND),parameter :: T_LAST = PI
-  real(kind=DBL_KIND),parameter :: T_LAST = 1.d0
+  real(kind=DBL_KIND),parameter :: T_LAST = PI
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 1.9 ! Orszag-Tang 問題でdivBクリーンなしでのクラッシュ直前
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 1.d0
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 4.d0
 
 #ifndef CONVERGENCE_TEST
-  integer,parameter :: NDIM = 1 ! number of dimension
-  integer,parameter :: NX = 64, NY = 1, NZ = 1
+  integer,parameter :: NDIM = 2 ! number of dimension
+  integer,parameter :: NX = 256, NY = 256, NZ = 1
 #endif !CONVERGENCE_TEST
   integer,parameter :: IMAX = NX-1, JMAX = NY-1, KMAX = NZ-1
   integer,parameter :: IMIN = 0,   JMIN = 0, KMIN = 0, MMIN = 0

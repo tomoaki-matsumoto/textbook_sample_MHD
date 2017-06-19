@@ -4,6 +4,11 @@ date
 make clean
 make
 rm DATA/*
-./main
-gnuplot plot1d.gp
+
+# for Open MP
+export OMP_STACKSIZE=512000
+export OMP_NUM_THREADS=4
+time ./main
+echo $OMP_NUM_THREADS
+# gnuplot plot1d.gp
 
