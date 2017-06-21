@@ -27,7 +27,7 @@ ERRNORM     = errornorm
 
 #### intel fortran (ifort)
 FC	 = ifort
-FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias -openmp -openmp-report2
+FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias -qopenmp
 CPPFLAGS = 
 # FFLAGS =  -traceback -g -warn all -check all -debug all
 
