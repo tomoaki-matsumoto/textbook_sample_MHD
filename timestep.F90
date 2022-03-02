@@ -137,7 +137,7 @@ contains
     use boundary
     call v2u(V, U)
     call boundary_fix(V)
-    call get_flux
+    call get_flux(bool_muscl=.FALSE.)
     W = U
     call w_update(Dtime*0.5d0)
     call u2v(W, V)
@@ -324,7 +324,7 @@ contains
     ! predictor
     call v2u(V, U)
     call boundary_fix(V)
-    call get_flux_ndir(ndir)
+    call get_flux_ndir(ndir, bool_muscl=.FALSE.)
     W = U
     call w_update_ndir(Dtime*0.5d0, ndir)
     call u2v(W, V)
@@ -387,10 +387,11 @@ contains
   ! ---------------------------------------------------------------------------
   ! flux at cell interface for all directions
   ! ---------------------------------------------------------------------------
-  subroutine get_flux
+  subroutine get_flux(bool_muscl)
     integer :: n
+    logical,optional :: bool_muscl
     do n = MX, MX+NDIM-1
-       call get_flux_ndir(n)
+       call get_flux_ndir(n, bool_muscl=bool_muscl)
     end do
   end subroutine get_flux
   ! ---------------------------------------------------------------------------
@@ -407,11 +408,12 @@ contains
 #ifdef MUSCL2_WO_LIMITER
 #define FLMT(x, y) (y)
 #endif
-  subroutine get_flux_ndir (ndir)
+  subroutine get_flux_ndir (ndir, bool_muscl)
     use util
     use grid
     use flux_eos
     integer,intent(IN) :: ndir
+    logical,optional :: bool_muscl
     real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX) :: f1d, vl, vr
     integer,dimension(MMIN:MMAX) :: mcycle
     integer :: io,jo,ko,i2,j2,k2,i,j,k,m
@@ -432,6 +434,10 @@ contains
     real(kind=DBL_KIND) :: cellWidth(MX:MZ), dx
 #endif
 
+    logical :: b_muscl
+    b_muscl = .TRUE.
+    if (present(bool_muscl)) b_muscl = bool_muscl
+
     call util_arroffset(ndir,io,jo,ko)
     i2 = io*2
     j2 = jo*2
@@ -440,63 +446,76 @@ contains
     cellWidth=get_cellWidth()
     dx = cellWidth(ndir)
 #endif
+
     do m = MMIN, MMAX
        do k = KMIN-ko, KMAX
-#if defined(RECONSTRUCTION_MUSCL3)
-!$omp parallel do private(i,dva,dvb)
-#elif defined(RECONSTRUCTION_LIMO3)
-!$omp parallel do private(i,duLL,duLR,duRL,duRR,thtL,thtR,etaL,etaR,flagL,flagR,phiL,phiR)
-#else
-!$omp parallel do private(i)
-#endif
           do j = JMIN-jo, JMAX
              do i = IMIN-io, IMAX
-#if defined(RECONSTRUCTION_NONE)
                 vl(i,j,k,m) = V(i,j,k,m)
                 vr(i,j,k,m) = V(i+io,j+jo,k+ko,m)
-#elif defined(RECONSTRUCTION_MUSCL2)
-                vl(i,j,k,m) = V(i,j,k,m) &
-                     + (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i,j,k,m)-V(i-io,j-jo,k-ko,m)))*0.5d0
-                vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
-                     - (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)))*0.5d0
-#elif defined(RECONSTRUCTION_MUSCL3)
-                ! Computational Gasdynamics, p 581, C. B. Laney (1998)
-                dva = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
-                dvb = V(i,j,k,m) - V(i-io,j-jo,k-ko,m)
-                vl(i,j,k,m) = V(i,j,k,m) &
-                     + (1.d0 - ETA)/4.d0 * MINMOD(dvb, BW*dva) &
-                     + (1.d0 + ETA)/4.d0 * MINMOD(dva, BW*dvb)
-                dva = V(i+i2,j+j2,k+k2,m) - V(i+io,j+jo,k+ko,m)
-                dvb = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
-                vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) &
-                     - (1.d0 - ETA)/4.d0 * MINMOD(dva, BW*dvb) &
-                     - (1.d0 + ETA)/4.d0 * MINMOD(dvb, BW*dva)
+             end do
+          end do
+       end do
+    end do
+
+#if !defined(RECONSTRUCTION_NONE)
+    if (b_muscl) then
+       do m = MMIN, MMAX
+          do k = KMIN-ko, KMAX
+#if defined(RECONSTRUCTION_MUSCL3)
+             !$omp parallel do private(i,dva,dvb)
 #elif defined(RECONSTRUCTION_LIMO3)
-                ! Cada & Torrilhon (2009), JCP, 228, 4118, 10.1016/j.jcp.2009.02.020
-                duLL = V(i,j,k,m)-V(i-io,j-jo,k-ko,m)
-                duLR = V(i+io,j+jo,k+ko,m)-V(i,j,k,m)
-                duRL = duLR
-                duRR = V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)
-                thtL = duLL/(abs(duLR)+eps)*sign(1.d0,duLR)
-                thtR = duRR/(abs(duRL)+eps)*sign(1.d0,duRL)
-                etaL = (duLL**2 + duLR**2)/(rlimit*dx)**2
-                etaR = (duRL**2 + duRR**2)/(rlimit*dx)**2
-                flagL = 0.5d0+sign(0.5d0,etaL-1.d0) ! if eta > 1 then 1 else 0
-                flagR = 0.5d0+sign(0.5d0,etaL-1.d0) ! if eta > 1 then 1 else 0
-                phiL = flagL * max(0.d0, min((2.d0+thtL)/3.d0, max(-0.5d0*thtL,min(2.d0*thtL,(2.d0+thtL)/3.d0,1.6d0)))) &
-                     + (1.d0-flagL) * (2.d0+thtL)/3.d0
-                phiR = flagR * max(0.d0, min((2.d0+thtR)/3.d0, max(-0.5d0*thtR,min(2.d0*thtR,(2.d0+thtR)/3.d0,1.6d0)))) &
-                     + (1.d0-flagR) * (2.d0+thtR)/3.d0
-                vl(i,j,k,m) = V(i,j,k,m) + 0.5d0*duLR*phiL
-                vr(i,j,k,m) = V(i+io,j+jo,k+ko,m) - 0.5d0*duRL*phiR
+             !$omp parallel do private(i,duLL,duLR,duRL,duRR,thtL,thtR,etaL,etaR,flagL,flagR,phiL,phiR)
 #else
-                ERROR
+             !$omp parallel do private(i)
 #endif
+             do j = JMIN-jo, JMAX
+                do i = IMIN-io, IMAX
+#if defined(RECONSTRUCTION_MUSCL2)
+                   vl(i,j,k,m) = vl(i,j,k,m) &
+                        + (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i,j,k,m)-V(i-io,j-jo,k-ko,m)))*0.5d0
+                   vr(i,j,k,m) = vr(i,j,k,m) &
+                        - (FLMT(V(i+io,j+jo,k+ko,m)-V(i,j,k,m), V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)))*0.5d0
+#elif defined(RECONSTRUCTION_MUSCL3)
+                   ! Computational Gasdynamics, p 581, C. B. Laney (1998)
+                   dva = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
+                   dvb = V(i,j,k,m) - V(i-io,j-jo,k-ko,m)
+                   vl(i,j,k,m) = vl(i,j,k,m) &
+                        + (1.d0 - ETA)/4.d0 * MINMOD(dvb, BW*dva) &
+                        + (1.d0 + ETA)/4.d0 * MINMOD(dva, BW*dvb)
+                   dva = V(i+i2,j+j2,k+k2,m) - V(i+io,j+jo,k+ko,m)
+                   dvb = V(i+io,j+jo,k+ko,m) - V(i,j,k,m)
+                   vr(i,j,k,m) = vr(i,j,k,m) &
+                        - (1.d0 - ETA)/4.d0 * MINMOD(dva, BW*dvb) &
+                        - (1.d0 + ETA)/4.d0 * MINMOD(dvb, BW*dva)
+#elif defined(RECONSTRUCTION_LIMO3)
+                   ! Cada & Torrilhon (2009), JCP, 228, 4118, 10.1016/j.jcp.2009.02.020
+                   duLL = V(i,j,k,m)-V(i-io,j-jo,k-ko,m)
+                   duLR = V(i+io,j+jo,k+ko,m)-V(i,j,k,m)
+                   duRL = duLR
+                   duRR = V(i+i2,j+j2,k+k2,m)-V(i+io,j+jo,k+ko,m)
+                   thtL = duLL/(abs(duLR)+eps)*sign(1.d0,duLR)
+                   thtR = duRR/(abs(duRL)+eps)*sign(1.d0,duRL)
+                   etaL = (duLL**2 + duLR**2)/(rlimit*dx)**2
+                   etaR = (duRL**2 + duRR**2)/(rlimit*dx)**2
+                   flagL = 0.5d0+sign(0.5d0,etaL-1.d0) ! if eta > 1 then 1 else 0
+                   flagR = 0.5d0+sign(0.5d0,etaL-1.d0) ! if eta > 1 then 1 else 0
+                   phiL = flagL * max(0.d0, min((2.d0+thtL)/3.d0, max(-0.5d0*thtL,min(2.d0*thtL,(2.d0+thtL)/3.d0,1.6d0)))) &
+                        + (1.d0-flagL) * (2.d0+thtL)/3.d0
+                   phiR = flagR * max(0.d0, min((2.d0+thtR)/3.d0, max(-0.5d0*thtR,min(2.d0*thtR,(2.d0+thtR)/3.d0,1.6d0)))) &
+                        + (1.d0-flagR) * (2.d0+thtR)/3.d0
+                   vl(i,j,k,m) = vl(i,j,k,m) + 0.5d0*duLR*phiL
+                   vr(i,j,k,m) = vr(i,j,k,m) - 0.5d0*duRL*phiR
+#else
+                   ERROR
+#endif
+                enddo
              enddo
+             !$omp end parallel do
           enddo
-!$omp end parallel do
        enddo
-    enddo
+    endif
+#endif !RECONSTRUCTION_NONE
     mcycle = cyclecomp( ndir )
     vl = vl(:,:,:,mcycle)
     vr = vr(:,:,:,mcycle)
