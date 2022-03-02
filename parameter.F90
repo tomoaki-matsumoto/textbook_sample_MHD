@@ -12,10 +12,11 @@ module parameter
 
   ! Condition for a halt
   integer,parameter :: STEPMAX = 1000000
-  real(kind=DBL_KIND),parameter :: T_LAST = PI
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 1.0  ! shock tube problem, etc.
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 0.55 ! wave propagation
+  real(kind=DBL_KIND),parameter :: T_LAST = PI  ! Orszag-Tang 問題（通常）
   ! real(kind=DBL_KIND),parameter :: T_LAST = 1.9 ! Orszag-Tang 問題でdivBクリーンなしでのクラッシュ直前
-  ! real(kind=DBL_KIND),parameter :: T_LAST = 1.d0
-  ! real(kind=DBL_KIND),parameter :: T_LAST = 4.d0
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 4.d0 ! wind tunnel with a step
 
 #ifndef CONVERGENCE_TEST
   integer,parameter :: NDIM = 2 ! number of dimension
