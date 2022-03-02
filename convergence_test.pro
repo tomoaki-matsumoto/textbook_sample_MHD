@@ -14,15 +14,18 @@
 ;; logfile = 'AdvNoneEuler.log'
 ;; logfile = 'AdvMUSCL2Euler.log'
 ;; logfile = 'AdvMUSCL2PC2.log'
-logfile = 'AdvSuperBee2PC2.log'
+;; logfile = 'AdvSuperBee2PC2.log'
 ;; logfile = 'AdvMUSCL2RK2.log'
 ;; logfile = 'AdvMUSCL3PC2.log'
 ;; logfile = 'AdvMUSCL3RK3.log'
 ;; logfile = 'AdvMUSCL3K3.log'
 
-;; logfile = 'test.log'
+logfile = 'test.log'
 
 logdir = 'convergence_test'
+
+!p.charsize=1.6
+symsize=1.5
 
 logfile = logdir +'/'+ logfile
 nline = wc(logfile)
@@ -46,9 +49,9 @@ free_lun, unit
 yrange=[min(l1norm)<min(l2norm)<min(linfnorm), max(linfnorm)>max(l2norm)>max(linfnorm)]
 yrange=yrange * [0.1^0.1, 10^0.1]
 xrange = [min(nz),max(nz)] * [0.1^0.1, 10^0.1]
-plot, nz, l1norm, psym=usrsymbol(-10), xrange=xrange, yrange=yrange, /xlog, /ylog, xtitle='Number of cells', ytitle='Norms of error', xstyle=1, ystyle=1
-oplot, nz, l2norm, psym=-7
-oplot, nz, linfnorm, psym=-4
+plot, nz, l1norm, psym=usrsymbol(-10), xrange=xrange, yrange=yrange, /xlog, /ylog, xtitle='Number of cells', ytitle='Norms of error', xstyle=1, ystyle=1, symsize=symsize
+oplot, nz, l2norm, psym=-7, symsize=symsize
+oplot, nz, linfnorm, psym=-4, symsize=symsize
 
 
 np=n_elements(nz)-1
