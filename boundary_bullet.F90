@@ -16,7 +16,7 @@ contains
   subroutine boundary_fix ( u )
     real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: u
     real(kind=DBL_KIND),dimension(MX:MZ) :: h
-    real(kind=DBL_KIND),parameter :: RHO0=1.4d0, P0=1.d0, VX0=3.d0, FLOOR_RHO=RHO0/1000, FLOOR_P=P0/1000, FLOOR_VX=VX0*100
+    real(kind=DBL_KIND),parameter :: RHO0=1.4d0, P0=1.d0, VX0=3.d0
     integer :: istepmin, istepmax, jstepmin,jstepmax, i, j, k
 
     call cure_crash_v( u )
