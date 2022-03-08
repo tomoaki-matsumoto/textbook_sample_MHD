@@ -12,7 +12,10 @@ module parameter
 
   ! Condition for a halt
   integer,parameter :: STEPMAX = 1000000
-  ! real(kind=DBL_KIND),parameter :: T_LAST = 1.0  ! shock tube problem, etc.
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 1.0  !
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 0.2  ! shock tube problem
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 0.1  ! shock tube problem (Brio & Wu)
+  ! real(kind=DBL_KIND),parameter :: T_LAST = 0.15  ! w/o entropy fix
   ! real(kind=DBL_KIND),parameter :: T_LAST = 0.55 ! wave propagation
   real(kind=DBL_KIND),parameter :: T_LAST = PI  ! Orszag-Tang 問題（通常）
   ! real(kind=DBL_KIND),parameter :: T_LAST = 1.9 ! Orszag-Tang 問題でdivBクリーンなしでのクラッシュ直前
@@ -20,7 +23,7 @@ module parameter
 
 #ifndef CONVERGENCE_TEST
   integer,parameter :: NDIM = 2 ! number of dimension
-  integer,parameter :: NX = 256, NY = 256, NZ = 1
+  integer,parameter :: NX =256, NY = 256, NZ = 1
 #endif !CONVERGENCE_TEST
   integer,parameter :: IMAX = NX-1, JMAX = NY-1, KMAX = NZ-1
   integer,parameter :: IMIN = 0,   JMIN = 0, KMIN = 0, MMIN = 0

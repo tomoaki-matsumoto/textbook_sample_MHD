@@ -1,5 +1,6 @@
-
 #include "config.h"
+! coordinate: the orign is located at the center of comp. domain
+! #define ORIGIN_AT_CENTER
 module init
   use parameter
   implicit none
@@ -9,12 +10,7 @@ contains
   subroutine init_cond
     use grid
     integer :: i, j, k
-#ifdef FLUX_SCHEME_MHD
-    ! Brio & Wu (1988)
-    real(kind=DBL_KIND) :: BOXSIZE_X = 10.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
-#else
-    real(kind=DBL_KIND) :: BOXSIZE_X = 5.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
-#endif
+    real(kind=DBL_KIND) :: BOXSIZE_X = 1.d0, BOXSIZE_Y = 1.d0, BOXSIZE_Z = 1.d0
     real(kind=DBL_KIND) :: dx, dy, dz
     real(kind=DBL_KIND) :: bx, by, bz
     real(kind=DBL_KIND) :: ic0, jc0, kc0
@@ -27,7 +23,11 @@ contains
     dy = BOXSIZE_Y/(JMAX-JMIN+1)
     dz = BOXSIZE_Z/(KMAX-KMIN+1)
     ! origin in cell number
-    ic0 = (IMAX-IMIN)/2.d0
+#ifdef ORIGIN_AT_CENTER
+    ic0 = (IMAX-IMIN)/2.d0    ! 0 at center
+#else !ORIGIN_AT_CENTER
+    ic0 = -0.5d0                ! 0 at edge
+#endif !ORIGIN_AT_CENTER
     jc0 = (JMAX-JMIN)/2.d0
     kc0 = (KMAX-KMIN)/2.d0
     do i = IMINGH, IMAXGH
@@ -46,7 +46,7 @@ contains
           do i = IMINGH, IMAXGH
 
 #ifdef FLUX_SCHEME_SCALAR_ADVECTION
-             if ( x(i) <= 0.d0 ) then
+             if ( x(i) <= (x(IMIN)+x(IMAX))/2.d0 ) then
                 V(i,j,k,MRHO) = 1.d0
              else
                 V(i,j,k,MRHO) = 0.d0
@@ -55,21 +55,20 @@ contains
 
 
 #ifdef FLUX_SCHEME_HD
-             if ( x(i) <= 0.d0 ) then
+             if ( x(i) <= (x(IMIN)+x(IMAX))/2.d0 ) then
                 V(i,j,k,MRHO) = 1.d0
-!                V(i,j,k,MVX) = 0.9d0  ! for entropy fix
+                ! V(i,j,k,MVX) = 0.9d0  ! for entropy fix
                 V(i,j,k,MP) = 1.d0
              else
                 V(i,j,k,MRHO) = 0.125d0
-!                V(i,j,k,MVX) = 0.9d0   ! for entropy fix
+                ! V(i,j,k,MVX) = 0.9d0   ! for entropy fix
                 V(i,j,k,MP) = 0.1d0
              end if
 #endif !FLUX_SCHEME_HD
 
-
              ! Brio & Wu (1988)
 #ifdef FLUX_SCHEME_MHD
-             if ( x(i) <= 0.d0 ) then
+             if ( x(i) <= (x(IMIN)+x(IMAX))/2.d0 ) then
                 V(i,j,k,MRHO) = 1.d0
                 V(i,j,k,MP) = 1.d0
                 V(i,j,k,MBX) = 0.75d0 * SQRTPI4
