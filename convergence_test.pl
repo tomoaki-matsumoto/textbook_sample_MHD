@@ -38,7 +38,7 @@ foreach my $p (@res_pw) {
     system("make clean $devnull");
     system("make $cppflags $devnull");
     system("make $cppflags errornorm $devnull");
-    system("./main $devnull");
+    system("./convergence_test.sh $devnull");
     system("./errornorm | tail -1 >> $logdir/$logfile");
 }
 print "\n";
