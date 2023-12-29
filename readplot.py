@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 #! /bin/env python3
-# last updated : 2023/12/29 18:58:12
+# last updated : 2023/12/30 00:11:59
 #
 # Example of reading and ploting data
 #
 # 
-
 
 import numpy as np
 
@@ -38,11 +37,17 @@ def read( fn ):
     nm = mmax + 1
 
     # example for reading multiple arrays in one record, then remove ghost cells.
-    dt = np.dtype([("x", "f8", ni), ("y", "f8", nj), ("z", "f8", nk)])
-    chunk = f.read_reals(dtype=dt)
-    x = chunk[0]["x"][NGH:-NGH]
-    y = chunk[0]["y"][NGH:-NGH]
-    z = chunk[0]["z"][NGH:-NGH]
+    # dt = np.dtype([("x", "f8", ni), ("y", "f8", nj), ("z", "f8", nk)])
+    # chunk = f.read_reals(dtype=dt)
+    # x = chunk[0]["x"][NGH:-NGH]
+    # y = chunk[0]["y"][NGH:-NGH]
+    # z = chunk[0]["z"][NGH:-NGH]
+
+    # same as above codes
+    xyz = f.read_reals(dtype=np.float64)
+    x = xyz[0:ni    ][NGH:-NGH]
+    y = xyz[ni:ni+nj][NGH:-NGH]
+    z = xyz[ni+nj:  ][NGH:-NGH]
 
     # example for reading one array in one record, then reforming and removing ghost cells
     v = f.read_reals(dtype=np.float64).reshape((ni, nj, nk, nm),order="F")[NGH:-NGH,NGH:-NGH,NGH:-NGH,:]
@@ -52,7 +57,7 @@ def read( fn ):
 
 def plot_2d_cont(x, y, v2d):
     """
-    Plot 2D contour, v2d, in the x-y plane.
+    Plot 2D contour of v2d in the x-y plane.
     """
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
@@ -64,7 +69,7 @@ def plot_2d_cont(x, y, v2d):
     
 def plot_2d_pix(x, y, v2d):
     """
-    Plot 2D pixel map, v2d, in the x-y plane.
+    Plot 2D pixel map of v2d in the x-y plane.
     """
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
@@ -99,7 +104,7 @@ if __name__ == "__main__":
     dir='DATA'
     prefix = 'st'
     suffix = '.d'
-    fn = glob.glob(os.path.join(dir, prefix+'*'+suffix))[-1]
+    fn = glob.glob(os.path.join(dir, prefix+'*'+suffix))[-1] # last stage
     print(fn)
     x, y, z, v, time, step = read(fn)
     

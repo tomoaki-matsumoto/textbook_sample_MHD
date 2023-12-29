@@ -3,6 +3,8 @@ ulimit -s 819200000
 date
 make clean
 make
+
+mkdir -p DATA
 rm DATA/*
 
 # for Open MP
