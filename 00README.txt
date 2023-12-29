@@ -28,6 +28,7 @@
 * plot2d.gp		Gnuplot： 2次元データの可視化
   plot2d.pro		IDL： 2次元データの可視化
   readdatap.pro		IDL：データ読み込み
+* readplot.py		Python: データの読み込みと可視化
 * run.sh			シミュレーション実行スクリプト
   timestep.F90		時間ステップの推進
   util.f90		雑多なルーチン
