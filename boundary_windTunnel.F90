@@ -13,12 +13,13 @@ module boundary
   private
   public :: boundary_fix
 contains
-  subroutine boundary_fix ( u )
+  subroutine boundary_fix ( u, ndir )
     real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: u
+    integer,optional :: ndir
     real(kind=DBL_KIND),dimension(MX:MZ) :: h
     real(kind=DBL_KIND),parameter :: RHO0=1.4d0, P0=1.d0, VX0=3.d0
     integer :: istepmin, istepmax, jstepmin,jstepmax, i, j, k
-
+    logical :: bool_mx, bool_my, bool_mz
     call cure_crash_v( u )
 
     ! inflow boundary at x=0
@@ -31,6 +32,7 @@ contains
     do i = IMAX+1,IMAXGH
        u(i,:,:,:) = u(IMAX,:,:,:)
     enddo
+
     ! reflection boundary at y=0
     do j = JMINGH, JMINGH+1
        u(:,j,:,MRHO) = u(:,2*JMIN-1-j,:,MRHO)
@@ -55,7 +57,6 @@ contains
     jstepmin = JMINGH
     jstepmax = 0.2d0/h(MY)
 
-    ! reflection boundary at y=0.2
 #define ISTEPS istepmin:istepmax
 #define JSTEPS jstepmin:jstepmax
     u(ISTEPS,JSTEPS,:,MRHO) = RHO0
@@ -64,6 +65,7 @@ contains
     u(ISTEPS,JSTEPS,:,MVY) = 0.d0
     u(ISTEPS,JSTEPS,:,MVZ) = 0.d0
 
+    ! reflection boundary at x=0.6
     do i = istepmin, istepmin+1
        u(i,JSTEPS,:,MRHO) = u(2*istepmin-1-i,JSTEPS,:,MRHO)
        u(i,JSTEPS,:,MP)  =  u(2*istepmin-1-i,JSTEPS,:,MP)
@@ -72,6 +74,7 @@ contains
        u(i,JSTEPS,:,MVZ) =  u(2*istepmin-1-i,JSTEPS,:,MVZ)
     enddo
 
+    ! reflection boundary at y=0.2
     do j = jstepmax-1, jstepmax
        u(ISTEPS,j,:,MRHO) = u(ISTEPS,2*jstepmax+1-j,:,MRHO)
        u(ISTEPS,j,:,MP)  =  u(ISTEPS,2*jstepmax+1-j,:,MP)
@@ -79,6 +82,28 @@ contains
        u(ISTEPS,j,:,MVY) = -u(ISTEPS,2*jstepmax+1-j,:,MVY)
        u(ISTEPS,j,:,MVZ) =  u(ISTEPS,2*jstepmax+1-j,:,MVZ)
     enddo
+
+    !corner
+    u(istepmin,jstepmax,:,MRHO) = ( u(istepmin-1,jstepmax,:,MRHO) + u(istepmin,jstepmax+1,:,MRHO))/2.d0
+    u(istepmin,jstepmax,:,MP  ) = ( u(istepmin-1,jstepmax,:,MP  ) + u(istepmin,jstepmax+1,:,MP  ))/2.d0
+    u(istepmin,jstepmax,:,MVX ) = (-u(istepmin-1,jstepmax,:,MVX ) + u(istepmin,jstepmax+1,:,MVX ))/2.d0
+    u(istepmin,jstepmax,:,MVY ) = ( u(istepmin-1,jstepmax,:,MVY ) - u(istepmin,jstepmax+1,:,MVY ))/2.d0
+
+    u(istepmin,jstepmax-1,:,MRHO) =  u(istepmin-1,jstepmax-1,:,MRHO)
+    u(istepmin,jstepmax-1,:,MP  ) =  u(istepmin-1,jstepmax-1,:,MP  )
+    u(istepmin,jstepmax-1,:,MVX ) = -u(istepmin-1,jstepmax-1,:,MVX )
+    u(istepmin,jstepmax-1,:,MVY ) =  u(istepmin-1,jstepmax-1,:,MVY )
+
+    u(istepmin+1,jstepmax,:,MRHO) =  u(istepmin+1,jstepmax+1,:,MRHO)
+    u(istepmin+1,jstepmax,:,MP  ) =  u(istepmin+1,jstepmax+1,:,MP  )
+    u(istepmin+1,jstepmax,:,MVX ) =  u(istepmin+1,jstepmax+1,:,MVX )
+    u(istepmin+1,jstepmax,:,MVY ) = -u(istepmin+1,jstepmax+1,:,MVY )
+
+    u(istepmin+1,jstepmax-1,:,MRHO) = ( u(istepmin-2,jstepmax-1,:,MRHO) + u(istepmin+1,jstepmax+2,:,MRHO))/2.d0
+    u(istepmin+1,jstepmax-1,:,MP  ) = ( u(istepmin-2,jstepmax-1,:,MP  ) + u(istepmin+1,jstepmax+2,:,MP  ))/2.d0
+    u(istepmin+1,jstepmax-1,:,MVX ) = (-u(istepmin-2,jstepmax-1,:,MVX ) + u(istepmin+1,jstepmax+2,:,MVX ))/2.d0
+    u(istepmin+1,jstepmax-1,:,MVY ) = ( u(istepmin-2,jstepmax-1,:,MVY ) - u(istepmin+1,jstepmax+2,:,MVY ))/2.d0
+
 
     ! z-direction is periodic (dummy)
     u(:,:,KMINGH:KMINGH+1,:) = u(:,:,KMAX-1:KMAX,:)
