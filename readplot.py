@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #! /bin/env python3
-# last updated : 2023/12/30 00:11:59
+# last updated : 2024/01/09 11:08:39
 #
 # Example of reading and ploting data
 #
@@ -61,7 +61,11 @@ def plot_2d_cont(x, y, v2d):
     """
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots()
+    dx = x[1]-x[0]
+    dy = y[1]-y[0]
     cs = ax.contour(x, y, v2d.T, levels=30) # note: transpose v2d
+    ax.set_xlim(x.min()-dx/2, x.max()+dx/2)
+    ax.set_ylim(y.min()-dy/2, y.max()+dy/2)
     ax.set_aspect('equal')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
