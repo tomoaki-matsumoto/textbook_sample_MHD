@@ -31,9 +31,15 @@ FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -fno-fnalias -qopenmp
 CPPFLAGS = 
 # FFLAGS =  -traceback -g -warn all -check all -debug all
 
+#### intel fortran (ifx)
+# FC	 = ifx
+# FFLAGS = -u -O3 -shared-intel -mcmodel=large -fno-alias -qopenmp
+# CPPFLAGS = 
+# FFLAGS =  -traceback -g -warn all -check all -debug all
+
 #### gnu gfotran 
 # FC	 = gfortran
-# FFLAGS = -O3 -ffree-line-length-none
+# FFLAGS = -O3 -ffree-line-length-none -fopenmp
 # CPPFLAGS = 
 
 

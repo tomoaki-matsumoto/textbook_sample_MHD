@@ -10,7 +10,7 @@ rm DATA/*
 # for Open MP
 export OMP_STACKSIZE=512000
 export OMP_NUM_THREADS=4
-time ./main
+time ./main 2>&1 | tee stdout$$
 echo $OMP_NUM_THREADS
 # gnuplot plot1d.gp
 
