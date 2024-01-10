@@ -1,4 +1,4 @@
-! initial condition for advection problem for contact discontinuity
+! initial condition for wind tunnel problem with a step.
 #include "config.h"
 #ifndef FLUX_SCHEME_HD
 ERROR: this initial condition is only for FLUX_SCHEME_HD. Check config.h and Makefile.

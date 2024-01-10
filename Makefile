@@ -9,6 +9,7 @@ BOUNDARY    = boundary_periodic
 #INIT        = init_advect
 #INIT        = init_shocktube
 INIT        = init_Orszag_Tang
+#INIT        = init_KHI
 #INIT        = init_windTunnel
 #INIT        = init_bullet
 #FLUX        = flux_scalarAdvection
