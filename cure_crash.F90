@@ -15,17 +15,17 @@ module cure_crash
 #ifndef FLUX_SCHEME_SCALAR_ADVECTION
   public :: cure_crash_v
 contains
-  subroutine cure_crash_v( u )
+  subroutine cure_crash_v( v )
     use parameter
-    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: u
+    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: v
     real(kind=DBL_KIND),parameter :: FLOOR_RHO = 0.d0, FLOOR_P = 0.d0
     integer :: i, j, k, is, ie, js, je, ks, ke, ncell
     real(kind=DBL_KIND) :: rho_ave, p_ave, vx_ave, vy_ave, vz_ave
-#define RHO(i,j,k) u(i,j,k,MRHO)
-#define P(i,j,k) u(i,j,k,MP)
-#define VX(i,j,k) u(i,j,k,MVX)
-#define VY(i,j,k) u(i,j,k,MVY)
-#define VZ(i,j,k) u(i,j,k,MVZ)
+#define RHO(i,j,k) v(i,j,k,MRHO)
+#define P(i,j,k) v(i,j,k,MP)
+#define VX(i,j,k) v(i,j,k,MVX)
+#define VY(i,j,k) v(i,j,k,MVY)
+#define VZ(i,j,k) v(i,j,k,MVZ)
 
 #ifdef CURE_MOMENTUM_CONSERVATION
     do k=KMIN,KMAX

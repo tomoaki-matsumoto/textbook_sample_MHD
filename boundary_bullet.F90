@@ -13,35 +13,35 @@ module boundary
   private
   public :: boundary_fix
 contains
-  subroutine boundary_fix ( u )
-    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: u
+  subroutine boundary_fix ( v )
+    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: v
     real(kind=DBL_KIND),dimension(MX:MZ) :: h
     real(kind=DBL_KIND),parameter :: RHO0=1.4d0, P0=1.d0, VX0=3.d0
     integer :: istepmin, istepmax, jstepmin,jstepmax, i, j, k
 
-    call cure_crash_v( u )
+    call cure_crash_v( v )
 
     ! inflow boundary at x=0
-    u(IMINGH:IMINGH+1,:,:,MRHO) = RHO0
-    u(IMINGH:IMINGH+1,:,:,MP)  = P0
-    u(IMINGH:IMINGH+1,:,:,MVX) = VX0
-    u(IMINGH:IMINGH+1,:,:,MVY) = 0.d0
-    u(IMINGH:IMINGH+1,:,:,MVZ) = 0.d0
+    v(IMINGH:IMINGH+1,:,:,MRHO) = RHO0
+    v(IMINGH:IMINGH+1,:,:,MP)  = P0
+    v(IMINGH:IMINGH+1,:,:,MVX) = VX0
+    v(IMINGH:IMINGH+1,:,:,MVY) = 0.d0
+    v(IMINGH:IMINGH+1,:,:,MVZ) = 0.d0
     ! free boundary at x=3
     do i = IMAX+1,IMAXGH
-       u(i,:,:,:) = u(IMAX,:,:,:)
+       v(i,:,:,:) = v(IMAX,:,:,:)
     enddo
     ! free boundary at jmin
     do j = JMINGH,JMIN-1
-       u(:,j,:,:) = u(:,JMIN,:,:)
+       v(:,j,:,:) = v(:,JMIN,:,:)
     enddo
     ! free boundary at jmax
     do j = JMAX+1,JMAXGH
-       u(:,j,:,:) = u(:,JMAX,:,:)
+       v(:,j,:,:) = v(:,JMAX,:,:)
     enddo
     ! z-direction is periodic (dummy)
-    u(:,:,KMINGH:KMINGH+1,:) = u(:,:,KMAX-1:KMAX,:)
-    u(:,:,KMAXGH-1:KMAXGH,:) = u(:,:,KMIN:KMIN+1,:)
+    v(:,:,KMINGH:KMINGH+1,:) = v(:,:,KMAX-1:KMAX,:)
+    v(:,:,KMAXGH-1:KMAXGH,:) = v(:,:,KMIN:KMIN+1,:)
 
     ! for step x in [0.62], y in [0.4,0.6]
     h = get_cellWidth()
@@ -53,43 +53,43 @@ contains
     ! reflection boundary at y=0.2
 #define ISTEPS istepmin:istepmax
 #define JSTEPS jstepmin:jstepmax
-    u(ISTEPS,JSTEPS,:,MRHO) = RHO0
-    u(ISTEPS,JSTEPS,:,MP) =   P0
-    u(ISTEPS,JSTEPS,:,MVX) = 0.d0
-    u(ISTEPS,JSTEPS,:,MVY) = 0.d0
-    u(ISTEPS,JSTEPS,:,MVZ) = 0.d0
+    v(ISTEPS,JSTEPS,:,MRHO) = RHO0
+    v(ISTEPS,JSTEPS,:,MP) =   P0
+    v(ISTEPS,JSTEPS,:,MVX) = 0.d0
+    v(ISTEPS,JSTEPS,:,MVY) = 0.d0
+    v(ISTEPS,JSTEPS,:,MVZ) = 0.d0
 
     ! left imin
     do i = istepmin, istepmin+1
-       u(i,JSTEPS,:,MRHO) = u(2*istepmin-1-i,JSTEPS,:,MRHO)
-       u(i,JSTEPS,:,MP)  =  u(2*istepmin-1-i,JSTEPS,:,MP)
-       u(i,JSTEPS,:,MVX) = -u(2*istepmin-1-i,JSTEPS,:,MVX)
-       u(i,JSTEPS,:,MVY) =  u(2*istepmin-1-i,JSTEPS,:,MVY)
-       u(i,JSTEPS,:,MVZ) =  u(2*istepmin-1-i,JSTEPS,:,MVZ)
+       v(i,JSTEPS,:,MRHO) = v(2*istepmin-1-i,JSTEPS,:,MRHO)
+       v(i,JSTEPS,:,MP)  =  v(2*istepmin-1-i,JSTEPS,:,MP)
+       v(i,JSTEPS,:,MVX) = -v(2*istepmin-1-i,JSTEPS,:,MVX)
+       v(i,JSTEPS,:,MVY) =  v(2*istepmin-1-i,JSTEPS,:,MVY)
+       v(i,JSTEPS,:,MVZ) =  v(2*istepmin-1-i,JSTEPS,:,MVZ)
     enddo
     ! right imax
     do i = istepmax-1, istepmax
-       u(i,JSTEPS,:,MRHO) = u(2*istepmax+1-i,JSTEPS,:,MRHO)
-       u(i,JSTEPS,:,MP)  =  u(2*istepmax+1-i,JSTEPS,:,MP)
-       u(i,JSTEPS,:,MVX) = -u(2*istepmax+1-i,JSTEPS,:,MVX)
-       u(i,JSTEPS,:,MVY) =  u(2*istepmax+1-i,JSTEPS,:,MVY)
-       u(i,JSTEPS,:,MVZ) =  u(2*istepmax+1-i,JSTEPS,:,MVZ)
+       v(i,JSTEPS,:,MRHO) = v(2*istepmax+1-i,JSTEPS,:,MRHO)
+       v(i,JSTEPS,:,MP)  =  v(2*istepmax+1-i,JSTEPS,:,MP)
+       v(i,JSTEPS,:,MVX) = -v(2*istepmax+1-i,JSTEPS,:,MVX)
+       v(i,JSTEPS,:,MVY) =  v(2*istepmax+1-i,JSTEPS,:,MVY)
+       v(i,JSTEPS,:,MVZ) =  v(2*istepmax+1-i,JSTEPS,:,MVZ)
     enddo
     ! bottom jmin
     do j = jstepmin, jstepmin+1
-       u(ISTEPS,j,:,MRHO) = u(ISTEPS,2*jstepmin-1-j,:,MRHO)
-       u(ISTEPS,j,:,MP)  =  u(ISTEPS,2*jstepmin-1-j,:,MP)
-       u(ISTEPS,j,:,MVX) =  u(ISTEPS,2*jstepmin-1-j,:,MVX)
-       u(ISTEPS,j,:,MVY) = -u(ISTEPS,2*jstepmin-1-j,:,MVY)
-       u(ISTEPS,j,:,MVZ) =  u(ISTEPS,2*jstepmin-1-j,:,MVZ)
+       v(ISTEPS,j,:,MRHO) = v(ISTEPS,2*jstepmin-1-j,:,MRHO)
+       v(ISTEPS,j,:,MP)  =  v(ISTEPS,2*jstepmin-1-j,:,MP)
+       v(ISTEPS,j,:,MVX) =  v(ISTEPS,2*jstepmin-1-j,:,MVX)
+       v(ISTEPS,j,:,MVY) = -v(ISTEPS,2*jstepmin-1-j,:,MVY)
+       v(ISTEPS,j,:,MVZ) =  v(ISTEPS,2*jstepmin-1-j,:,MVZ)
     enddo
     ! top jmax
     do j = jstepmax-1, jstepmax
-       u(ISTEPS,j,:,MRHO) = u(ISTEPS,2*jstepmax+1-j,:,MRHO)
-       u(ISTEPS,j,:,MP)  =  u(ISTEPS,2*jstepmax+1-j,:,MP)
-       u(ISTEPS,j,:,MVX) =  u(ISTEPS,2*jstepmax+1-j,:,MVX)
-       u(ISTEPS,j,:,MVY) = -u(ISTEPS,2*jstepmax+1-j,:,MVY)
-       u(ISTEPS,j,:,MVZ) =  u(ISTEPS,2*jstepmax+1-j,:,MVZ)
+       v(ISTEPS,j,:,MRHO) = v(ISTEPS,2*jstepmax+1-j,:,MRHO)
+       v(ISTEPS,j,:,MP)  =  v(ISTEPS,2*jstepmax+1-j,:,MP)
+       v(ISTEPS,j,:,MVX) =  v(ISTEPS,2*jstepmax+1-j,:,MVX)
+       v(ISTEPS,j,:,MVY) = -v(ISTEPS,2*jstepmax+1-j,:,MVY)
+       v(ISTEPS,j,:,MVZ) =  v(ISTEPS,2*jstepmax+1-j,:,MVZ)
     enddo
   end subroutine boundary_fix
 end module boundary

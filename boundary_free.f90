@@ -8,26 +8,26 @@ module boundary
   private
   public :: boundary_fix
 contains
-  subroutine boundary_fix ( u )
-    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: u
+  subroutine boundary_fix ( v )
+    real(kind=DBL_KIND),dimension(IMINGH:IMAXGH,JMINGH:JMAXGH,KMINGH:KMAXGH,MMIN:MMAX),intent(INOUT) :: v
     integer :: i, j, k
     do i = IMINGH,IMIN-1
-       u(i,:,:,:) = u(IMIN,:,:,:)
+       v(i,:,:,:) = v(IMIN,:,:,:)
     enddo
     do i = IMAX+1,IMAXGH
-       u(i,:,:,:) = u(IMAX,:,:,:)
+       v(i,:,:,:) = v(IMAX,:,:,:)
     enddo
     do j = JMINGH,JMIN-1
-       u(:,j,:,:) = u(:,JMIN,:,:)
+       v(:,j,:,:) = v(:,JMIN,:,:)
     enddo
     do j = JMAX+1,JMAXGH
-       u(:,j,:,:) = u(:,JMAX,:,:)
+       v(:,j,:,:) = v(:,JMAX,:,:)
     enddo
     do k = KMINGH,KMIN-1
-       u(:,:,k,:) = u(:,:,KMIN,:)
+       v(:,:,k,:) = v(:,:,KMIN,:)
     enddo
     do k = KMAX+1,KMAXGH
-       u(:,:,k,:) = u(:,:,KMAX,:)
+       v(:,:,k,:) = v(:,:,KMAX,:)
     enddo
   end subroutine boundary_fix
 end module boundary
